@@ -38,8 +38,8 @@ pode receber no máximo 2 golpes de "juggle" (gancho/super). Melhor de 3 rounds,
 ## Personagens (`js/characters.js`)
 | Lutador | Vel/For/Vida | Especiais |
 |---|---|---|
-| Maués | 6/7/6 | Chinelada, Gancho do Maués, Furacão de Chinelo, SUPER CHINELADA |
-| João Pedro | 4/8/9 | Granada, Gancho de Comando, Rajada de Coturno, BOMBARDEIO TÁTICO |
+| Maués | 9/6/7 | Taco Voador (taco de hóquei girando), Gancho do Maués, Furacão de Chinelo, SUPER TACADA |
+| João Pedro | 3/7/8 | Granada, Gancho de Comando, Rajada de Coturno, BOMBARDEIO TÁTICO |
 | Lutador 3 | 4/9/8 | Pedrada, Gancho de Pedra, Rolo Compressor, Terremoto Total |
 | Lutador 4 | 7/7/4 | Raio Roxo, Gancho Voador, Pião Roxo, Fúria Violeta |
 | Chefão | 7/9/10 | chefe final do Arcade (no Versus pode ser escolhido) |

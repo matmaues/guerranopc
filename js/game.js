@@ -213,7 +213,13 @@ function updateFight() {
 function drawProjectile(p) {
   const x = Math.round(p.x), y = Math.round(p.y), c = p.owner.cfg.accent, big = p.superP ? 2 : 1, F = Math.sign(p.vx);
   for (let i = 1; i < 4; i++) { g.fillStyle = c + ["aa", "66", "33"][i - 1]; g.fillRect(x - F * i * 6 * big - 3, y - 3 * big + i, 6 * big, (6 - i) * big); }
-  if (p.kind === "chinelo") { g.save(); g.translate(x, y); g.rotate(game.frame * 0.4 * F); g.scale(big, big); g.fillStyle = "#111"; g.fillRect(-7, -4, 14, 8); g.fillStyle = "#fff"; g.fillRect(-6, -3, 12, 6); g.fillStyle = "#3c3cc8"; g.fillRect(-1, -3, 2, 4); g.fillRect(-4, -1, 8, 1); g.restore(); }
+  const ps = p.owner.cfg.projSprite && img(p.owner.cfg.projSprite);
+  if (ps && ps.complete && ps.naturalWidth) { // sprite próprio (ex.: taco do Maués): gira em passos de 90° p/ manter os pixels nítidos; espelha pelo lado
+    const k = Math.floor(game.frame / 4) % 4, s2 = 0.5;  // 1 pixel de arte = mesmo tamanho do Maués (super: brilho + 5 acertos)
+    g.save(); g.translate(x, y); g.scale(F, 1); g.rotate(k * Math.PI / 2); g.scale(s2, s2); g.drawImage(ps, -ps.width / 2, -ps.height / 2);
+    if (p.superP && game.frame % 4 < 2) { g.globalAlpha = 0.35; g.globalCompositeOperation = "lighter"; g.drawImage(ps, -ps.width / 2, -ps.height / 2); }
+    g.restore(); }
+  else if (p.kind === "chinelo") { g.save(); g.translate(x, y); g.rotate(game.frame * 0.4 * F); g.scale(big, big); g.fillStyle = "#111"; g.fillRect(-7, -4, 14, 8); g.fillStyle = "#fff"; g.fillRect(-6, -3, 12, 6); g.fillStyle = "#3c3cc8"; g.fillRect(-1, -3, 2, 4); g.fillRect(-4, -1, 8, 1); g.restore(); }
   else if (p.kind === "granada") { g.save(); g.translate(x, y); g.scale(big, big); g.fillStyle = "#111"; g.fillRect(-5, -5, 10, 10); g.fillStyle = "#4a5530"; g.fillRect(-4, -4, 8, 8); g.fillStyle = "#6b6e45"; g.fillRect(-3, -3, 3, 3); g.fillStyle = "#999"; g.fillRect(-1, -7, 3, 3); g.fillStyle = game.frame % 6 < 3 ? "#ff0" : "#f80"; g.fillRect(1, -8, 2, 2); g.restore(); }
   else { const r = 5 * big; g.fillStyle = c; g.fillRect(x - r, y - r, r * 2, r * 2); g.fillStyle = "#fff"; g.fillRect(x - r / 2, y - r / 2, r, r); }
 }

@@ -103,9 +103,9 @@ class Fighter {
   runMove(opp, game) {
     const m = this.m, f = ++this.mf, n = this.mn, F = this.facing;
     if (n === "fireball" && f === m.s) game.projectiles.push({ x: this.x + F * 18, y: this.y - 30, vx: F * (this.str === "h" ? 3.4 : 2.4) * (m.vel || 1), owner: this, hits: 1, cd: 0,
-      mv: { dmg: m.dmg ?? 9, hs: 18, bs: 14, push: 2.5, lvl: "mid", chip: 2, heavy: 1 }, r: 6, life: 200, kind: this.cfg.projectile });
+      mv: { dmg: m.dmg ?? 9, hs: 18, bs: 14, push: 2.5, lvl: "mid", chip: 2, heavy: 1 }, r: this.cfg.projR || 6, life: 200, kind: this.cfg.projectile });
     if (n === "super" && f === m.s) { game.projectiles.push({ x: this.x + F * 20, y: this.y - 30, vx: F * 3.2 * (m.vel || 1), owner: this, hits: m.hits ?? 5, cd: 0, superP: 1,
-      mv: { dmg: m.dmg ?? 6, hs: 22, bs: 10, push: 1.2, lvl: "mid", chip: 1.5, heavy: 1, juggle: 1 }, r: 11, life: 200, kind: this.cfg.projectile }); Audio8.superSfx(); }
+      mv: { dmg: m.dmg ?? 6, hs: 22, bs: 10, push: 1.2, lvl: "mid", chip: 1.5, heavy: 1, juggle: 1 }, r: (this.cfg.projR || 6) + 5, life: 200, kind: this.cfg.projectile }); Audio8.superSfx(); }
     if (n === "dp") {
       if (f === m.s) { this.vy = -(this.str === "h" ? 7.4 : 6.2); this.vx = F * (this.str === "h" ? 1.6 : 1.0); this.y -= 1; }
       if (f > m.s + m.a && !this.grounded && !this.landed) this.mf = m.s + m.a;

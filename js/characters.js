@@ -16,8 +16,8 @@ function alturaTxt(c) { return c.alturaReal ? c.alturaReal.toFixed(2).replace(".
 // Medido com tools/sim (CPU x CPU nível 4, 200 lutas, lados alternados): Maués 47,5% x João 52,5%.
 const CHARACTERS = [
   { name: "Maués", alturaReal: 1.80, alturaArte: 88, color: "#1f4fc4", accent: "#ffd23f", stats: { speed: 9, power: 6, health: 7 },
-    sprite: "assets/maues.png", spriteLegs: true, skin: "#e9a57e", legX: [9, 24], punchSprite: "assets/maues_punch.png", projectile: "chinelo",
-    specials: { fireball: "CHINELADA", dp: "GANCHO DO MAUÉS", spin: "FURACÃO DE CHINELO", super: "SUPER CHINELADA" },
+    sprite: "assets/maues.png", spriteLegs: true, skin: "#e9a57e", legX: [9, 24], punchSprite: "assets/maues_punch.png", projectile: "taco", projSprite: "assets/maues_taco.png", projR: 9,
+    specials: { fireball: "TACO VOADOR", dp: "GANCHO DO MAUÉS", spin: "FURACÃO DE CHINELO", super: "SUPER TACADA" },
     quote: "Chinelo branco não perdoa ninguém!",
     skins: [{ nome: "Original" }] },
   { name: "João Pedro", alturaReal: 1.78, alturaArte: 77, color: "#4a5530", accent: "#3fa34d", stats: { speed: 3, power: 7, health: 8 }, sprite: null, parts: "assets/joao/", partsMeta: { ox: -21, legX: [8, 22] }, projectile: "granada",
@@ -50,10 +50,10 @@ const PLANILHA = {
   "accent": "#ffd23f",
   "quote": "Chinelo branco não perdoa ninguém!",
   "specials": {
-   "fireball": "CHINELADA",
+   "fireball": "TACO VOADOR",
    "dp": "GANCHO DO MAUÉS",
    "spin": "FURACÃO DE CHINELO",
-   "super": "SUPER CHINELADA"
+   "super": "SUPER TACADA"
   },
   "moves": {
    "fireball": {},
