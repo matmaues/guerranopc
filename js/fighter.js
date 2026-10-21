@@ -238,7 +238,7 @@ class Fighter {
     g.save(); g.translate(x, y); g.scale(f * 0.5, 0.5); if (this.flash % 4 > 1) g.globalAlpha = 0.5;
     if (pose === "down" || pose === "fall") { g.rotate(pose === "fall" ? -1.0 : -Math.PI / 2); g.drawImage(win, -win.width / 2 + 6, -win.height + 4); g.restore(); return; }
     if (pose === "win") { g.drawImage(win, -win.width / 2, -win.height); g.restore(); return; }
-    const LH = legL.height, ox = -15, heavy = this.m && this.m.heavy;
+    const M = this.cfg.partsMeta || { ox: -15, legX: [1, 12] }, LH = legL.height, ox = M.ox, heavy = this.m && this.m.heavy;
     let hipY = -LH + 2, rot = 0, dx = 0, sy = 1, rl = 0, rr = 0;
     const crouchP = ["crouch", "cpunch", "ckick", "cblock", "cupper"].includes(pose), air = ["jump", "jpunch", "jkick", "upper"].includes(pose);
     if (crouchP) { sy = 0.6; hipY = -LH * 0.6 + 2; }
@@ -251,7 +251,7 @@ class Fighter {
     if (["punch", "cpunch", "jpunch"].includes(pose)) { dx = 3; rot = 0.05; }
     const leg = (im, lx, r, s2) => { g.save(); g.translate(lx + im.width / 2, hipY); g.rotate(r); g.scale(1, s2); g.drawImage(im, -im.width / 2, 0); g.restore(); };
     g.translate(dx, 0);
-    leg(legL, ox + 1, rl, sy); leg(legR, ox + 12, rr, rr < -1 ? 1 : sy);
+    leg(legL, ox + M.legX[0], rl, sy); leg(legR, ox + M.legX[1], rr, rr < -1 ? 1 : sy);
     g.save(); g.translate(0, hipY + 2); g.rotate(rot); g.drawImage(up, ox, -up.height); g.restore();
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = this.cfg.accent + "88"; g.fillRect(-30, -110, 12, 90); }
     g.restore();
