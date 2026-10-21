@@ -112,7 +112,8 @@ function select() {
     txt(c.name, x, 92, 9, pi ? "#3b9bff" : "#ff3b3b", al);
     [["VEL", c.stats.speed], ["FOR", c.stats.power], ["VID", c.stats.health]].forEach(([l, v], j) => { const bx = al === "left" ? x + 20 : x - 70, by = 101 + j * 7;
       txt(l, al === "left" ? x : x - 74, by, 6, "#ccc", al === "left" ? "left" : "right"); g.fillStyle = "#333"; g.fillRect(bx, by - 2, 50, 4); g.fillStyle = c.accent; g.fillRect(bx, by - 2, v * 5, 4); });
-    if (game.ready[pi]) txt("PRONTO!", x, 128, 7, "#7f7", al); };
+    if (c.alturaReal) txt("ALT " + alturaTxt(c), x, 122, 6, "#ffd23f", al);
+    if (game.ready[pi]) txt("PRONTO!", x, 130, 7, "#7f7", al); };
   info(0, 10, "left");
   if (game.mode === "versus" || cpuPick) info(1, W - 10, "right");
   else if (free) { txt("LUTA LIVRE: depois escolha", W - 10, 96, 6, "#ccc", "right"); txt("O ADVERSÁRIO (CPU)", W - 10, 106, 8, "#3b9bff", "right"); txt("Dificuldade: " + DIFFS[game.diff].n, W - 10, 118, 6, "#8cf", "right"); }
@@ -167,7 +168,8 @@ function vs() {
   g.fillStyle = "#10307a"; g.beginPath(); g.moveTo(W, 0); g.lineTo(W / 2 + 22, 0); g.lineTo(W / 2 - 18, H); g.lineTo(W, H); g.fill();
   for (let i = 0; i < 12; i++) { g.fillStyle = "#fff2"; g.fillRect(((i * 53 + t * 6) % (W + 40)) - 40, (i * 29) % H, 30, 2); }
   portrait(game.sel[0], -60 + sl * 140, 150, 2.4, "idle", 1); portrait(game.sel[1], W + 60 - sl * 140, 150, 2.4, "idle", -1);
-  txt(CHARACTERS[game.sel[0]].name.toUpperCase(), 10, 166, 12, "#fff", "left"); txt(CHARACTERS[game.sel[1]].name.toUpperCase(), W - 10, 166, 12, "#fff", "right");
+  txt(CHARACTERS[game.sel[0]].name.toUpperCase(), 10, 160, 12, "#fff", "left"); txt(CHARACTERS[game.sel[1]].name.toUpperCase(), W - 10, 160, 12, "#fff", "right");
+  txt(alturaTxt(CHARACTERS[game.sel[0]]), 10, 172, 7, "#ffd23f", "left"); txt(alturaTxt(CHARACTERS[game.sel[1]]), W - 10, 172, 7, "#ffd23f", "right");
   if (t > 20) txt("VS", W / 2, 80, 34 + Math.max(0, 10 - (t - 20)) * 3, game.frame % 6 < 3 ? "#ffd23f" : "#fff", "center", "#f80", 2);
   if (game.mode === "free") txt("LUTA LIVRE", W / 2, 14, 9, "#fff");
   if (game.mode === "arcade") { const boss = CHARACTERS[game.sel[1]].boss; txt(boss ? "LUTA FINAL: CHEFÃO!" : `LUTA ${game.ladderPos + 1} DE ${game.ladder.length}`, W / 2, 14, 9, boss ? "#f44" : "#fff"); }

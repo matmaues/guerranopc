@@ -30,9 +30,9 @@ K=10; big=up(m,K).convert('RGB'); g=ImageDraw.Draw(big)
 for x in range(0,big.width,K): g.line([x,0,x,big.height],fill=(232,232,240))
 for y in range(0,big.height,K): g.line([0,y,big.width,y],fill=(232,232,240))
 big=Image.composite(up(m,K),big,up(m.convert('L').point(lambda v:255 if v<250 else 0),K))  # grade só no fundo
-P=Image.new('RGB',(big.width+560,big.height+330),WH); P.paste(big,(60,80)); d=ImageDraw.Draw(P)
+P=Image.new('RGB',(big.width+560,big.height+480),WH); P.paste(big,(60,190)); d=ImageDraw.Draw(P)
 d.text((20,15),"MOLDE BASE — GUERRA no P.C   (1 quadrado = 1 pixel de arte)",fill=OL,font=fnt(24))
-red=(220,30,30); X0=60; Y0=80; gx=X0+big.width+20
+red=(220,30,30); X0=60; Y0=190; gx=X0+big.width+20
 def vg(y1,y2,txt,xx):
     d.line([xx,Y0+y1*K,xx,Y0+y2*K],fill=red,width=3)
     for yy in (y1,y2): d.line([xx-8,Y0+yy*K,xx+8,Y0+yy*K],fill=red,width=3)
@@ -41,6 +41,11 @@ vg(1,25,"cabeça: 24 px",gx); vg(25,66,"tronco+short: 41 px",gx); vg(66,88,"pern
 d.text((gx+305,Y0+40*K),"altura\ntotal:\n88 px",fill=red,font=fnt(24))
 d.line([X0+2*K,Y0-8,X0+43*K,Y0-8],fill=(30,90,220),width=3); d.text((X0+5*K,Y0-40),"ombros/braços: 41 px · cabeça: 23 px",fill=(30,90,220),font=fnt(20))
 yb=Y0+big.height+30; d.text((60,yb),"tamanho real 1x  e  2x:",fill=OL,font=fnt(20)); P.paste(m,(330,yb)); P.paste(up(m,2),(400,yb))
+for hpx,nome,col in ((80,'BAIXO ≤1,65 m = 80 px',(0,150,0)),(88,'MÉDIO 1,80 m = 88 px',(30,90,220)),(96,'ALTO ≥1,95 m = 96 px',(200,0,160))):
+    yy=Y0+(89-hpx)*K
+    for xx in range(X0-40,X0+big.width,14): d.line([xx,yy,xx+7,yy],fill=col,width=2)
+    d.text((X0+big.width+20 if hpx!=88 else X0+big.width+20,yy-22),nome,fill=col,font=fnt(18))
+d.text((20,Y0+big.height+210),"Pés SEMPRE na mesma linha de base. Altura = pés até o topo da cabeça (cabelo alto/chapéu não contam).",fill=OL,font=fnt(15))
 P.save('kit/molde_base.png')
 # comparação
 row=[('MOLDE',m.convert('RGBA')),('MAUÉS',maues()),('JOÃO PEDRO',Image.open('assets/joao/win.png').convert('RGBA'))]

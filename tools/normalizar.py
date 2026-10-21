@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Normalizador de sprites — GUERRA no P.C
-Uso:  python3 tools/normalizar.py ENTRADA.png assets/NOME.png [--altura 88] [--cores 24] [--topo-extra 0.25]
+Uso:  python3 tools/normalizar.py ENTRADA.png assets/NOME.png [--altura 1.80] [--cores 24] [--topo-extra 0.25]
   1. remove o fundo (branco/cor uniforme das bordas, por flood-fill)
   2. recorta no personagem
   3. detecta a grade de pixel-art (se a imagem veio ampliada) e reduz para 1 px = 1 pixel de arte
@@ -72,11 +72,13 @@ def contorno(im):
     return b.crop(b.getbbox())
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('entrada'); ap.add_argument('saida')
-    ap.add_argument('--altura',type=int,default=88); ap.add_argument('--cores',type=int,default=24)
+    ap.add_argument('--altura',type=float,default=1.80,help='altura REAL em metros (ex.: 1.78) ou em px se > 3. 1,80 m = 88 px, ±3 px a cada 5 cm, limite 80–96'); ap.add_argument('--cores',type=int,default=24)
     ap.add_argument('--topo-extra',type=float,default=0.25,help='fração da altura que cabelo/chapéu pode ultrapassar')
     ap.add_argument('--cabeca',type=int,default=0,help='(opcional) linha do topo da cabeça na imagem já recortada, ignorando cabelo/chapéu')
     ap.add_argument('--tolerancia',type=float,default=0.2,help='se a grade nativa der altura dentro de ±20%% do alvo, mantém 1:1 (pixels originais)')
     a=ap.parse_args()
+    if a.altura<=3: a.altura=max(80,min(96,round(88+(a.altura-1.80)/0.05*3)))
+    a.altura=int(a.altura)
     im=tira_fundo(Image.open(a.entrada)); G=grade(im); k=1
     if G: k=G[0]; im=nativo(im,*G)
     corpo=im.height-(round(a.cabeca/k) if a.cabeca else 0)       # pés -> topo da cabeça
@@ -87,5 +89,6 @@ def main():
     al=im.getchannel('A').point(lambda v:255 if v>=128 else 0)
     rgb=im.convert('RGB').quantize(colors=a.cores,method=Image.MEDIANCUT,dither=Image.NONE).convert('RGBA'); rgb.putalpha(al)
     out=contorno(rgb); out.save(a.saida)
+    print(f"alvo {a.altura} px. Em js/characters.js use alturaReal (m) e alturaArte: {out.size[1]}  (o jogo escala p/ o alvo)")
     print(f"ok {a.saida}: {out.size[0]}x{out.size[1]} px (grade detectada {k:.2f}px, escala {esc:.2f})")
 if __name__=='__main__': main()

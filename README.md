@@ -79,3 +79,13 @@ Molde, exemplos e prompt para o Gemini: veja `kit/LEIA-ME.txt`. O kit fixa o est
   - limpa a paleta e refaz o contorno de 1 px.
 - No `js/characters.js`, use `sprite: "assets/NOME.png", fullSprite: true`. O personagem é desenhado inteiro, e as poses vêm de inclinação e deslocamento.
 - `tools/molde.py` regenera as imagens do kit.
+
+## Altura dos personagens
+Em `js/characters.js` cada personagem tem `alturaReal` (m) e `alturaArte`, que é a altura do PNG em 1:1, dos pés até o topo da cabeça.
+- A altura em jogo é 1,80 m = 88 px, ±3 px a cada 5 cm, limitada entre 80 e 96 px (`alturaPx()`).
+- O jogo escala o sprite até esse alvo usando o vizinho mais próximo.
+- Mais alto ganha um alcance levemente maior.
+- A altura aparece na seleção e no VS.
+- Maués: 1,80 m, 88 px, em 1:1.
+- João Pedro: 1,78 m, 87 px; a arte de 77 px é escalada ×1,13.
+O `tools/normalizar.py` aceita `--altura 1.78` (em metros).

@@ -144,7 +144,7 @@ class Fighter {
   }
   overlap(opp, m) {
     if (!opp.vulnerable(m)) return false;
-    const b = m.box, F = this.facing, x1 = this.x + F * 4, x2 = this.x + F * (6 + b[0]);
+    const b = m.box, F = this.facing, x1 = this.x + F * 4, x2 = this.x + F * (6 + b[0] + (alturaPx(this.cfg) - 88) * 0.5);  // alcance extra p/ mais alto
     const [hx1, hy1, hx2, hy2] = opp.hurtbox();
     return Math.max(x1, x2) > hx1 && Math.min(x1, x2) < hx2 && this.y + b[2] > hy1 && this.y + b[1] < hy2;
   }
@@ -190,6 +190,11 @@ class Fighter {
     return st === "walk" ? "walk" : "idle";
   }
   draw(g) {
+    const c = this.cfg, hs = c.alturaArte ? alturaPx(c) / c.alturaArte : 1;
+    if (hs === 1) return this.drawBody(g);
+    g.save(); g.translate(Math.round(this.x), Math.round(this.y)); g.scale(hs, hs); g.translate(-Math.round(this.x), -Math.round(this.y)); this.drawBody(g); g.restore();
+  }
+  drawBody(g) {
     const x = Math.round(this.x), y = Math.round(this.y), s = this.cfg.scale || 1;
     let f = this.facing; const pose = this.pose();
     if (pose === "spin" && Math.floor(this.anim / 4) % 2) f = -f;
@@ -237,7 +242,8 @@ class Fighter {
     const up = I(["punch", "cpunch", "jpunch"].includes(pose) ? "punch" : ["upper", "cupper"].includes(pose) ? "upper" : ["block", "cblock"].includes(pose) ? "block" : "guard");
     if (!win || !legL || !legR || !up) return;
     g.save(); g.translate(x, y); g.scale(f * 0.5, 0.5); if (this.flash % 4 > 1) g.globalAlpha = 0.5;
-    if (pose === "down" || pose === "fall") { g.rotate(pose === "fall" ? -1.0 : -Math.PI / 2); g.drawImage(win, -win.width / 2 + 6, -win.height + 4); g.restore(); return; }
+    if (pose === "down") { g.rotate(-Math.PI / 2); g.drawImage(win, 0, -win.height / 2); g.restore(); return; }  // deitado: corpo inteiro apoiado no chão
+    if (pose === "fall") { g.rotate(-1.0); g.drawImage(win, -win.width / 2 + 6, -win.height + 4); g.restore(); return; }
     if (pose === "win") { g.drawImage(win, -win.width / 2, -win.height); g.restore(); return; }
     const M = this.cfg.partsMeta || { ox: -15, legX: [1, 12] }, LH = legL.height, ox = M.ox, heavy = this.m && this.m.heavy;
     let hipY = -LH + 2, rot = 0, dx = 0, sy = 1, rl = 0, rr = 0;
@@ -288,14 +294,16 @@ class Fighter {
       R("#ffffff", lx + 3, fy, 1, 1); R("#ffffff", lx + 4, fy + 1, 1, 1); R("#ffffff", lx + 9, fy, 1, 1); R("#ffffff", lx + 8, fy + 1, 1, 1); R("#ffffff", lx + 5, fy + 1, 3, 1); R(OL, lx + 6, fy + 2, 1, 1);
     };
     const hLeg = (hx, hy) => { g.save(); g.translate(hx, hy); g.rotate(-Math.PI / 2 + 0.12); leg(-5, -2, LEN + 4); g.restore(); };
-    if (pose === "down" || pose === "fall") { g.rotate(pose === "fall" ? -1.1 : -Math.PI / 2); g.drawImage(im, -ih / 2 + 10, ox - 10); g.restore(); return; }
+    // caído / KO: corpo + pernas + chinelos giram juntos (deitado no chão)
+    if (pose === "down") { g.translate(44, -iw / 2 + 2); g.rotate(-Math.PI / 2); pose = "lying"; }
+    else if (pose === "fall") { g.translate(30, -14); g.rotate(-1.1); pose = "lying"; }
     let ly = top + ih, rot = 0; const bob = pose === "idle" ? Math.floor(this.anim / 15) % 2 : 0, L = ox + legX[0], Rr = ox + legX[1];
     const lean = ["punch", "cpunch", "jpunch"].includes(pose), crouchP = ["crouch", "cpunch", "ckick", "cblock", "cupper"].includes(pose);
     const punchIm = lean && this.cfg.punchSprite ? Fighter.load(this.cfg.punchSprite) : null;
     if (lean) { g.translate(punchIm ? 3 : 8, 0); rot = punchIm ? 0.03 : 0.08; }
     if (pose === "hit") { g.translate(-5, 0); rot = -0.12; }
     if (pose === "upper" || pose === "win" || pose === "cupper") rot = -0.08;
-    if (crouchP) { ly += 12; leg(L - 2, ly, LEN - 12); if (pose === "ckick") hLeg(Rr + 5, ly + LEN - 6); else leg(Rr + 2, ly, LEN - 12); }
+    if (crouchP) { ly += 12; leg(L - 2, ly, LEN - 12); if (pose === "ckick") hLeg(Rr + 5, ly + LEN - 14); else leg(Rr + 2, ly, LEN - 12); }
     else if (["jump", "jpunch", "upper"].includes(pose)) { ly -= 4; leg(L, ly, LEN - 6); leg(Rr, ly, LEN - 2); }
     else if (pose === "jkick") { ly -= 4; leg(L, ly, LEN - 6); g.save(); g.translate(Rr + 5, ly + 2); g.rotate(-Math.PI / 2 + 0.6); leg(-5, -2, LEN + 4); g.restore(); }
     else if (pose === "kick" || pose === "spin") { leg(L - 4, ly, LEN); rot = -0.18; hLeg(Rr + 5, ly + 2); }

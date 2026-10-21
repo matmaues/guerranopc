@@ -13,16 +13,17 @@ Arquivos
 Passo a passo (Google Gemini)
 1. Abra o Gemini e peça uma geração de imagem.
 2. Anexe, NESTA ORDEM: molde_base.png, depois assets/maues.png (opcional), depois a foto da pessoa.
-3. Copie o prompt em português de prompt_personagem.txt, preencha [ROUPA], [ROSTO/CABELO] e [ACESSÓRIOS] e envie.
+3. Copie o prompt em português de prompt_personagem.txt, preencha [ROUPA], [ROSTO/CABELO], [ACESSÓRIOS] e
+   [ALTURA: X,XX m] (altura real da pessoa) e envie.
 4. Se vier errado (braços cruzados, fundo com cenário, detalhado demais), cole a CORREÇÃO certa do
    prompt_personagem.txt no mesmo chat. Normalmente 1 ou 2 correções bastam.
 5. Confira a imagem: corpo inteiro, virado para a direita, braços para baixo, fundo branco liso.
 6. Salve o PNG e normalize:
-     python3 tools/normalizar.py minha_imagem.png assets/fulano.png
+     python3 tools/normalizar.py minha_imagem.png assets/fulano.png --altura 1.75
    (se tiver cabelo ou chapéu muito alto: --cabeca N, onde N = linha em que começa a testa/cabeça
     na imagem recortada; assim a escala ignora o cabelo)
 7. Cadastre em js/characters.js, por exemplo copiando o bloco de um lutador e trocando:
-     name: "Fulano", sprite: "assets/fulano.png", fullSprite: true,
+     name: "Fulano", alturaReal: 1.75, alturaArte: <altura do PNG>, sprite: "assets/fulano.png", fullSprite: true,
    (apague qualquer "sprite: null" que estiver no mesmo bloco)
 8. Troque o número BUILD em index.html (window.BUILD e os ?v=) e publique.
 
@@ -34,3 +35,9 @@ O que o normalizador faz sozinho
   uma altura até 20% diferente (ex.: 77 px), mantém 1:1 para não deformar pixels (--tolerancia 0)
   (cabelo ou chapéu pode passar até 25% disso)
 - limpa a paleta (até 24 cores, sem semitons) e refaz o contorno preto de 1 px
+
+Altura dos personagens
+- 1,80 m = 88 px (Maués). Cada 5 cm a mais ou a menos = 3 px a mais ou a menos. Limite: 80 px (≤1,65 m) a 96 px (≥1,95 m).
+- O jogo lê alturaReal (m) e escala o sprite (alturaArte = altura do PNG) até o alvo. Também mostra "1,80 m" na seleção e no VS.
+- Mais alto = alcance um pouquinho maior (+0,5 unidade de jogo por px acima de 88).
+- O molde_base.png tem linhas-guia BAIXO, MÉDIO e ALTO.

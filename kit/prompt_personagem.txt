@@ -6,7 +6,7 @@ ANTES DE COLAR: anexe as imagens NESTA ORDEM no Gemini
   1ª imagem: kit/molde_base.png          (molde de estilo, proporção e pose)
   2ª imagem: assets/maues.png ou kit/molde_comparacao.png  (opcional: exemplo do estilo final)
   3ª imagem: a FOTO da pessoa
-Troque [ROUPA], [ROSTO/CABELO] e [ACESSÓRIOS] pelo que você quer.
+Troque [ROUPA], [ROSTO/CABELO], [ACESSÓRIOS] e [ALTURA] pelo que você quer.
 (Se não anexar a 2ª imagem, troque "terceira imagem" por "segunda imagem".)
 
 ----------------------------------------------------------------------
@@ -19,7 +19,8 @@ Regras de estilo (obrigatórias):
 - Contorno preto grosso de 1 pixel em volta de todo o personagem.
 - Sombreamento chapado: 2 a 3 tons por cor, no máximo.
 - Proporção chibi/robusta como no molde: cabeça grande (cerca de 1/4 da altura), corpo atarracado, pernas curtas.
-- Corpo inteiro da cabeça aos pés, nada cortado, pés apoiados na mesma linha.
+- Corpo inteiro da cabeça aos pés, nada cortado, pés apoiados na mesma linha de base do molde.
+- Preencha a tela do mesmo jeito que o molde: personagem centralizado, ocupando a mesma altura, com margem branca igual em cima e embaixo.
 - Em pé, virado levemente para a direita (3/4), os dois braços soltos para baixo ao lado do corpo.
 - Um único personagem, centralizado, fundo BRANCO PURO liso (#FFFFFF), sem chão, sem sombra, sem cenário.
 - Sem texto, sem letreiro, sem logos pequenos, sem marca d'água.
@@ -27,6 +28,7 @@ Regras de estilo (obrigatórias):
 Mantenha os traços marcantes da pessoa da foto, mesmo que saiam do contorno do molde: barriga, cabelo alto ou volumoso, barba, óculos, boné ou chapéu, corrente, tatuagem e tipo de corpo. O molde define o estilo e a pose, NÃO a silhueta.
 
 Personagem:
+- Altura real: [ALTURA: X,XX m] (o molde tem 1,80 m; mais baixo = um pouco menor, mais alto = um pouco maior, mesma proporção)
 - Roupa: [ROUPA]
 - Rosto/cabelo: [ROSTO/CABELO]
 - Acessórios: [ACESSÓRIOS]
@@ -41,7 +43,8 @@ Mandatory style rules:
 - Thick 1-pixel black outline around the whole character.
 - Flat shading with at most 2-3 tones per color.
 - Chunky chibi proportions like the template: big head (about 1/4 of the height), stocky body, short legs.
-- Full body from head to feet, nothing cropped, both feet on the same baseline.
+- Full body from head to feet, nothing cropped, both feet on the same baseline as the template.
+- Fill the canvas the same way as the template: centered, same height on the canvas, equal white margin above and below.
 - Standing, turned slightly to the right (3/4 view), both arms relaxed and hanging down at the sides.
 - One single character, centered, on a plain PURE WHITE background (#FFFFFF), with no floor, no shadow and no scenery.
 - No text, no lettering, no small logos, no watermark.
@@ -49,6 +52,7 @@ Mandatory style rules:
 Keep the person's distinctive traits even if they go beyond the template outline: belly, tall or big hair, beard, glasses, cap or hat, chain, tattoos and body type. The template defines the style and pose, NOT the silhouette.
 
 Character:
+- Real height: [ALTURA: X,XX m] (the template is 1.80 m; shorter = slightly smaller, taller = slightly bigger, same proportions)
 - Outfit: [ROUPA]
 - Face/hair: [ROSTO/CABELO]
 - Accessories: [ACESSÓRIOS]

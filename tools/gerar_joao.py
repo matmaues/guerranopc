@@ -19,6 +19,18 @@ for y in range(34,HIP+2):
 for y in range(52,HIP+2):
     for x in range(0,12): p[x,y]=(0,0,0,0)
     for x in range(33,W): p[x,y]=(0,0,0,0)
+# preenche com camuflado o lugar onde estavam os braços originais (sem buracos no tronco)
+q=body.load()
+for y in range(31,HIP):
+    xs=[x for x in range(W) if q[x,y][3]]
+    if not xs: continue
+    L,R=10,34
+    for x in range(L,R+1):
+        if q[x,y][3]==0 or (x in(L,R)):
+            src=q[min(max(x+(4 if x<22 else -4),12),32),y]
+            q[x,y]=src if src[3] else q[22,y]
+    q[L,y]=OL; q[R,y]=OL
+    for x in list(range(0,L))+list(range(R+1,W)): q[x,y]=(0,0,0,0)
 def outline(im):
     a=im.load(); o=im.copy(); b=o.load()
     for y in range(im.height):
@@ -33,14 +45,15 @@ R90=lambda im:im.transpose(Image.ROTATE_90)    # aponta p/ direita? (topo->esque
 UPV=lambda im: im.transpose(Image.ROTATE_180).transpose(Image.FLIP_LEFT_RIGHT)   # antebraço apontando p/ cima (mão no topo)
 def pose(kind):
     c=canvas()
-    put(c,ba_up,0,31)
     put(c,body,0,0)
-    if kind in('guard','punch','upper'): put(c,UPV(ba_lo).crop((3,0,12,19)),27,24)   # punho de trás na frente do peito
-    if kind=='block': put(c,UPV(ba_lo).crop((3,0,12,19)),28,10)
-    if kind=='guard':  put(c,UPV(fa_lo),36,18)                         # punho na altura do queixo
+    # braço de trás: manga caindo do ombro + antebraço para a frente (na frente do tronco)
+    if kind=='block': put(c,ba_up,0,31); put(c,ba_lo.transpose(Image.ROTATE_90),10,33)
+    else: put(c,ba_up,0,31); put(c,ba_lo.transpose(Image.ROTATE_90),6,39)
+    put(c,body.crop((10,26,35,34)),10,26)   # ombros por cima das mangas
+    if kind=='guard':   put(c,fa_up,34,30); put(c,UPV(fa_lo),35,22)      # L: cotovelo baixo, punho no queixo
     elif kind=='punch': put(c,front.transpose(Image.ROTATE_270),35,30)  # braço esticado
     elif kind=='upper': put(c,UPV(front),33,1)                          # punho p/ cima
-    elif kind=='block': put(c,UPV(fa_lo),35,6)                          # antebraço protegendo o rosto
+    elif kind=='block': put(c,fa_up,34,30); put(c,UPV(fa_lo),35,10)     # antebraço protegendo o rosto
     return outline(c)
 import os; d='assets/joao/'
 for f in os.listdir(d): os.remove(d+f)
