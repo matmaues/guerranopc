@@ -26,6 +26,7 @@ const game = {
     const vs = this.mode === "versus";
     const c1 = new HumanController(vs ? CONTROLS.p1vs : CONTROLS.p1), c2 = vs ? new HumanController(CONTROLS.p2) : new CPUController(this.level());
     this.p = [new Fighter(CHARACTERS[this.sel[0]], 100, 1, c1), new Fighter(CHARACTERS[this.sel[1]], 220, -1, c2)];
+    fixMirror(); this.p.forEach((f, i) => f.skin = skinFor(i));
     this.p.forEach(f => f.inFight = true);
     this.projectiles = []; this.parts = []; this.timer = 99; this.tAcc = 0; this.phase = "intro"; this.phaseT = 0; this.timeUp = false; this.perfect = false; this.roundWinner = -1;
   },
@@ -47,8 +48,11 @@ function drawStage(t) {
 }
 // ---------- retratos ----------
 const PORTRAITS = CHARACTERS.map(c => new Fighter(c, 0, 1, null));
-function portrait(i, x, y, sc = 1, pose = "idle", flip = 1, dark) {
-  const f = PORTRAITS[i]; f.x = 0; f.y = 0; f.facing = flip; f.state = "idle"; f.anim = game.frame; f.flash = 0; f.input = {}; f.inFight = false; const op = f.pose; f.pose = () => pose;
+const skinsOf = i => (CHARACTERS[i] && CHARACTERS[i].skins) || [{ nome: "Original" }];
+function fixMirror() { if (!game.skin) game.skin = [0, 0]; if (game.sel[0] === game.sel[1] && game.skin[0] === game.skin[1]) game.skin[1] = (game.skin[1] + 1) % skinsOf(game.sel[1]).length; }
+function skinFor(pi) { const l = skinsOf(game.sel[pi]); return l[((game.skin || [0, 0])[pi] || 0) % l.length]; }
+function portrait(i, x, y, sc = 1, pose = "idle", flip = 1, dark, skin) {
+  const f = PORTRAITS[i]; f.skin = skin || null; f.x = 0; f.y = 0; f.facing = flip; f.state = "idle"; f.anim = game.frame; f.flash = 0; f.input = {}; f.inFight = false; const op = f.pose; f.pose = () => pose;
   g.save(); try { g.translate(x, y); g.scale(sc, sc); if (dark) g.filter = "brightness(0)"; f.draw(g); } catch (e) { console.error("retrato", e); } finally { g.restore(); f.pose = op; }
 }
 function drawCommands(x, y, lh = 8, size = 6, cols = 2) {
@@ -100,7 +104,7 @@ function select() {
   CHARACTERS.forEach((c, i) => {
     const x = x0 + i * (cw + gap), lock = !selectable(i);
     g.fillStyle = "#000"; g.fillRect(x, y0, cw, ch); g.fillStyle = c.color + "55"; g.fillRect(x + 1, y0 + 1, cw - 2, ch - 2);
-    g.save(); g.beginPath(); g.rect(x + 1, y0 + 1, cw - 2, ch - 2); g.clip(); portrait(i, x + cw / 2, y0 + ch + 2, 1.05, "idle", 1, lock); g.restore();
+    g.save(); g.beginPath(); g.rect(x + 1, y0 + 1, cw - 2, ch - 2); g.clip(); portrait(i, x + cw / 2, y0 + ch + 2, 1.05, "idle", 1, lock, cpuPick && game.sel[1] === i ? skinFor(1) : game.sel[0] === i ? skinFor(0) : game.sel[1] === i && game.mode === "versus" ? skinFor(1) : null); g.restore();
     if (lock) txt("?", x + cw / 2, y0 + ch / 2, 20, "#888");
     txt(lock ? "???" : c.name.toUpperCase(), x + cw / 2, y0 + ch + 6, 6, "#fff");
   });
@@ -113,25 +117,30 @@ function select() {
     [["VEL", c.stats.speed], ["FOR", c.stats.power], ["VID", c.stats.health]].forEach(([l, v], j) => { const bx = al === "left" ? x + 20 : x - 70, by = 101 + j * 7;
       txt(l, al === "left" ? x : x - 74, by, 6, "#ccc", al === "left" ? "left" : "right"); g.fillStyle = "#333"; g.fillRect(bx, by - 2, 50, 4); g.fillStyle = c.accent; g.fillRect(bx, by - 2, v * 5, 4); });
     if (c.alturaReal) txt("ALT " + alturaTxt(c), x, 122, 6, "#ffd23f", al);
+    if (skinsOf(game.sel[pi]).length > 1) txt("▲▼ SKIN: " + skinFor(pi).nome, al === "left" ? x + 80 : x - 80, 122, 6, "#8cf", al);
     if (game.ready[pi]) txt("PRONTO!", x, 130, 7, "#7f7", al); };
   info(0, 10, "left");
   if (game.mode === "versus" || cpuPick) info(1, W - 10, "right");
   else if (free) { txt("LUTA LIVRE: depois escolha", W - 10, 96, 6, "#ccc", "right"); txt("O ADVERSÁRIO (CPU)", W - 10, 106, 8, "#3b9bff", "right"); txt("Dificuldade: " + DIFFS[game.diff].n, W - 10, 118, 6, "#8cf", "right"); }
   else { txt("ARCADE: vença todos e enfrente o", W - 10, 96, 6, "#ccc", "right"); txt("CHEFÃO!", W - 10, 106, 8, "#e83b3b", "right"); txt("Dificuldade: " + DIFFS[game.diff].n, W - 10, 118, 6, "#8cf", "right"); }
   g.fillStyle = "#0008"; g.fillRect(4, 134, W - 8, 44); drawCommands(10, 139, 8.4, 6, 2);
+  if (!game.skin) game.skin = [0, 0];
+  const skinMv = (pi, d) => { if (game.ready[pi] || game.sel[pi] === RANDOM) return; const L = skinsOf(game.sel[pi]).length; game.skin[pi] = ((game.skin[pi] || 0) + d + L) % L;
+    if (game.mode === "versus" && game.sel[0] === game.sel[1] && game.skin[0] === game.skin[1]) game.skin[pi] = (game.skin[pi] + d + L) % L; Audio8.menu(); };
   const move = (pi, d) => { if (game.ready[pi]) return; let s = game.sel[pi]; do { s = (s + d + n) % n; } while (!selectable(s, pi)); game.sel[pi] = s; Audio8.menu(); };
   if (game.mode === "versus") {
-    if (Input.any(["KeyA"])) move(0, -1); if (Input.any(["KeyD"])) move(0, 1);
+    if (Input.any(["KeyA"])) move(0, -1); if (Input.any(["KeyD"])) move(0, 1); if (Input.any(["KeyW"])) skinMv(0, -1); if (Input.any(["KeyS"])) skinMv(0, 1);
+    if (Input.any(["ArrowUp"])) skinMv(1, -1); if (Input.any(["ArrowDown"])) skinMv(1, 1);
     if (Input.any(["ArrowLeft"])) move(1, -1); if (Input.any(["ArrowRight"])) move(1, 1);
     if (Input.any(["Enter", "KeyU"]) && !game.ready[0]) { game.ready[0] = true; Audio8.coin(); }
     if (Input.any(["NumpadEnter", "Numpad4", "Comma"]) && !game.ready[1]) { game.ready[1] = true; Audio8.coin(); }
     if (game.ready[0] && game.ready[1]) { game.readyT = (game.readyT || 0) + 1; if (game.readyT > 30) { game.readyT = 0; game.screen = "stageSelect"; } }
   } else if (cpuPick) {
-    if (P("left")) move(1, -1); if (P("right")) move(1, 1);
+    if (P("left")) move(1, -1); if (P("right")) move(1, 1); if (P("up")) skinMv(1, -1); if (P("down")) skinMv(1, 1);
     if (P("ok")) { Audio8.coin(); if (game.sel[1] === RANDOM) { game.randomCPU = true; } else game.randomCPU = false; game.ready[1] = true; game.screen = "stageSelect"; }
     if (P("back")) { game.ready[0] = false; Audio8.menu(); return; }
   } else {
-    if (P("left")) move(0, -1); if (P("right")) move(0, 1);
+    if (P("left")) move(0, -1); if (P("right")) move(0, 1); if (P("up")) skinMv(0, -1); if (P("down")) skinMv(0, 1);
     if (P("ok")) { game.ready[0] = true; Audio8.coin(); if (free) { if (!selectable(game.sel[1], 1) || game.sel[1] === game.sel[0]) game.sel[1] = (game.sel[0] + 1) % CHARACTERS.length; } else game.screen = "stageSelect"; }
   }
   if (P("back")) { game.screen = "title"; game.ready = [false, false]; }
@@ -159,7 +168,7 @@ function stageSelect() {
     toVS(); }
 }
 // ---------- VS ----------
-function toVS() { game.screen = "vs"; game.vsT = 0; Audio8.stopMusic(); }
+function toVS() { fixMirror(); game.screen = "vs"; game.vsT = 0; Audio8.stopMusic(); }
 function vs() {
   const t = ++game.vsT; if (t === 20) Audio8.say("vs");
   g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
@@ -167,7 +176,7 @@ function vs() {
   g.fillStyle = "#7a1010"; g.beginPath(); g.moveTo(0, 0); g.lineTo(W / 2 + 20, 0); g.lineTo(W / 2 - 20, H); g.lineTo(0, H); g.fill();
   g.fillStyle = "#10307a"; g.beginPath(); g.moveTo(W, 0); g.lineTo(W / 2 + 22, 0); g.lineTo(W / 2 - 18, H); g.lineTo(W, H); g.fill();
   for (let i = 0; i < 12; i++) { g.fillStyle = "#fff2"; g.fillRect(((i * 53 + t * 6) % (W + 40)) - 40, (i * 29) % H, 30, 2); }
-  portrait(game.sel[0], -60 + sl * 140, 150, 2.4, "idle", 1); portrait(game.sel[1], W + 60 - sl * 140, 150, 2.4, "idle", -1);
+  portrait(game.sel[0], -60 + sl * 140, 150, 2.4, "idle", 1, 0, skinFor(0)); portrait(game.sel[1], W + 60 - sl * 140, 150, 2.4, "idle", -1, 0, skinFor(1));
   txt(CHARACTERS[game.sel[0]].name.toUpperCase(), 10, 160, 12, "#fff", "left"); txt(CHARACTERS[game.sel[1]].name.toUpperCase(), W - 10, 160, 12, "#fff", "right");
   txt(alturaTxt(CHARACTERS[game.sel[0]]), 10, 172, 7, "#ffd23f", "left"); txt(alturaTxt(CHARACTERS[game.sel[1]]), W - 10, 172, 7, "#ffd23f", "right");
   if (t > 20) txt("VS", W / 2, 80, 34 + Math.max(0, 10 - (t - 20)) * 3, game.frame % 6 < 3 ? "#ffd23f" : "#fff", "center", "#f80", 2);
@@ -275,7 +284,7 @@ function quote() {
   const t = ++game.qT, w = game.matchWinner, c = CHARACTERS[game.sel[w]];
   g.fillStyle = "#000"; g.fillRect(0, 0, W, H); g.fillStyle = c.color; g.fillRect(0, 20, 130, 140);
   for (let i = 0; i < 20; i++) { g.fillStyle = "#fff1"; g.fillRect(0, 20 + i * 7, 130, 3); }
-  portrait(game.sel[w], 65, 150, 2.4, "win", 1);
+  portrait(game.sel[w], 65, 150, 2.4, "win", 1, 0, skinFor(w));
   txt(c.name.toUpperCase(), 140, 40, 12, "#ffd23f", "left");
   g.fillStyle = "#111"; g.fillRect(138, 56, 174, 60); g.strokeStyle = "#fff"; g.lineWidth = 1; g.strokeRect(138.5, 56.5, 173, 59);
   const q = "“" + c.quote + "”", shown = q.slice(0, Math.floor(t / 2)); const words = shown.split(" "); let line = "", ly = 68;
@@ -290,7 +299,7 @@ function quote() {
 function cont() {
   game.cT--; const n = Math.ceil(game.cT / 60) - 1;
   g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
-  portrait(game.sel[0], W / 2, 120, 2, "hit", 1);
+  portrait(game.sel[0], W / 2, 120, 2, "hit", 1, 0, skinFor(0));
   txt("CONTINUAR?", W / 2, 30, 18, "#fff", "center", "#f00", 1.5);
   if (n >= 0) txt(String(n), W / 2, 150, 30, "#ffd23f", "center", "#f80", 2);
   if (game.cT % 60 === 0 && n >= 0) Audio8.tick();
@@ -302,7 +311,7 @@ function gameover() { g.fillStyle = "#000"; g.fillRect(0, 0, W, H); bigTxt("GAME
 function ending() {
   const t = ++game.eT; g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
   for (let i = 0; i < 30; i++) { g.fillStyle = `hsl(${(i * 40 + t * 3) % 360},90%,55%)`; g.fillRect((i * 53 + t * (1 + i % 3)) % W, (i * 31 + t * 2) % H, 3, 3); }
-  portrait(game.sel[0], W / 2, 150, 2.2, "win", 1);
+  portrait(game.sel[0], W / 2, 150, 2.2, "win", 1, 0, skinFor(0));
   bigTxt("PARABÉNS!", 24, 22, "#ffd23f", "#f80");
   txt(CHARACTERS[game.sel[0]].name + " derrotou o Chefão e é o campeão", W / 2, 44, 7, "#fff"); txt("da GUERRA no P.C!", W / 2, 54, 8, "#ff3b3b");
   if (t > 90 && game.frame % 30 < 20) txt("ENTER", W / 2, 172, 8, "#8cf");

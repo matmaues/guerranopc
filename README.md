@@ -89,3 +89,24 @@ Em `js/characters.js` cada personagem tem `alturaReal` (m) e `alturaArte`, que �
 - Maués: 1,80 m, 88 px, em 1:1.
 - João Pedro: 1,78 m, 87 px; a arte de 77 px é escalada ×1,13.
 O `tools/normalizar.py` aceita `--altura 1.78` (em metros).
+
+## Balanceamento
+Os arquétipos são diferentes de propósito:
+- Maués: VEL 9, FOR 6, VID 7. Rápido e ágil, com golpes mais fracos.
+- João Pedro: VEL 3, FOR 7, VID 8. Lento, forte e resistente.
+
+Simulação CPU x CPU (nível 4, 200 lutas, lados alternados): Maués 47,5% x João 52,5%. Rode `node tools/sim.js '<stats JSON>' 200` com o servidor local ligado.
+
+## Planilha de personagens
+`kit/personagens.xlsx` reúne atributos, altura, cores, frase e cada golpe especial (nome, dano, frames, velocidade e acertos). As células amarelas são editáveis.
+- `python3 tools/planilha.py importar` grava as mudanças em `js/characters.js`, no bloco PLANILHA no fim do arquivo.
+- `python3 tools/planilha.py exportar` recria a planilha a partir do jogo.
+- Os ajustes de especiais por personagem ficam em `moves` (fireball/super: `dmg`, `vel`, `hits`; dp/spin: `dmg`, `s`, `a`, `r`, `maxHits`).
+
+## Skins
+Cada personagem tem uma lista `skins`. Na seleção, ▲/▼ troca a skin; no Versus é W/S para o P1 e ▲/▼ para o P2. Num espelho, o P2 recebe outra skin automaticamente.
+
+Há três tipos de skin:
+- `troca`: troca de paleta por faixa de matiz.
+- `pasta`: imagens próprias com os mesmos nomes de arquivo, em `assets/skins/<nome>/`. O exemplo é `maues_branca`.
+- `color`/`accent`: para personagens desenhados por código.

@@ -1,0 +1,6 @@
+SKINS COM IMAGENS PRÓPRIAS
+Crie uma pasta aqui (ex.: assets/skins/maues_praia/) com arquivos de MESMO NOME e MESMO TAMANHO que os originais do personagem
+(Maués: maues.png e maues_punch.png; João Pedro: guard.png, punch.png, upper.png, block.png, leg_l.png, leg_r.png, win.png).
+Arquivo que faltar usa o original. Depois adicione em js/characters.js, na lista skins do personagem:
+  { nome: "Praia", pasta: "assets/skins/maues_praia/" }
+Exemplo pronto: maues_branca/ (camisa branca, short azul).

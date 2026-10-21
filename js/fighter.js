@@ -92,7 +92,7 @@ class Fighter {
     this.start(n, cmd.s, game); return true;
   }
   start(n, s, game) {
-    this.mn = n; this.m = MOVES[n]; this.mf = 0; this.hits = 0; this.mhit = false; this.lastHitF = -99; this.str = s || "l"; this.landed = false;
+    this.mn = n; this.m = Object.assign({}, MOVES[n], (this.cfg.moves || {})[n]); this.mf = 0; this.hits = 0; this.mhit = false; this.lastHitF = -99; this.str = s || "l"; this.landed = false;
     this.state = "attack"; if (!this.m.air) this.vx = 0;
     if (this.m.special) {
       this.meter = Math.min(100, this.meter + 3); const sp = this.cfg.specials || {};
@@ -102,10 +102,10 @@ class Fighter {
   }
   runMove(opp, game) {
     const m = this.m, f = ++this.mf, n = this.mn, F = this.facing;
-    if (n === "fireball" && f === m.s) game.projectiles.push({ x: this.x + F * 18, y: this.y - 30, vx: F * (this.str === "h" ? 3.4 : 2.4), owner: this, hits: 1, cd: 0,
-      mv: { dmg: 9, hs: 18, bs: 14, push: 2.5, lvl: "mid", chip: 2, heavy: 1 }, r: 6, life: 200, kind: this.cfg.projectile });
-    if (n === "super" && f === m.s) { game.projectiles.push({ x: this.x + F * 20, y: this.y - 30, vx: F * 3.2, owner: this, hits: 5, cd: 0, superP: 1,
-      mv: { dmg: 6, hs: 22, bs: 10, push: 1.2, lvl: "mid", chip: 1.5, heavy: 1, juggle: 1 }, r: 11, life: 200, kind: this.cfg.projectile }); Audio8.superSfx(); }
+    if (n === "fireball" && f === m.s) game.projectiles.push({ x: this.x + F * 18, y: this.y - 30, vx: F * (this.str === "h" ? 3.4 : 2.4) * (m.vel || 1), owner: this, hits: 1, cd: 0,
+      mv: { dmg: m.dmg ?? 9, hs: 18, bs: 14, push: 2.5, lvl: "mid", chip: 2, heavy: 1 }, r: 6, life: 200, kind: this.cfg.projectile });
+    if (n === "super" && f === m.s) { game.projectiles.push({ x: this.x + F * 20, y: this.y - 30, vx: F * 3.2 * (m.vel || 1), owner: this, hits: m.hits ?? 5, cd: 0, superP: 1,
+      mv: { dmg: m.dmg ?? 6, hs: 22, bs: 10, push: 1.2, lvl: "mid", chip: 1.5, heavy: 1, juggle: 1 }, r: 11, life: 200, kind: this.cfg.projectile }); Audio8.superSfx(); }
     if (n === "dp") {
       if (f === m.s) { this.vy = -(this.str === "h" ? 7.4 : 6.2); this.vx = F * (this.str === "h" ? 1.6 : 1.0); this.y -= 1; }
       if (f > m.s + m.a && !this.grounded && !this.landed) this.mf = m.s + m.a;
@@ -195,6 +195,7 @@ class Fighter {
     g.save(); g.translate(Math.round(this.x), Math.round(this.y)); g.scale(hs, hs); g.translate(-Math.round(this.x), -Math.round(this.y)); this.drawBody(g); g.restore();
   }
   drawBody(g) {
+    this.img = this.cfg.sprite ? this.tex(this.cfg.sprite) : null;
     const x = Math.round(this.x), y = Math.round(this.y), s = this.cfg.scale || 1;
     let f = this.facing; const pose = this.pose();
     if (pose === "spin" && Math.floor(this.anim / 4) % 2) f = -f;
@@ -205,7 +206,7 @@ class Fighter {
     g.save(); g.translate(x, y); g.scale(f * s, s); this.drawProc(g, pose); g.restore();
   }
   drawProc(g, pose) {
-    const c = this.cfg.color, ac = this.cfg.accent, sk = "#f2c49b", dk = "#222", W = this.flash % 4 > 1;
+    const c = (this.skin && this.skin.color) || this.cfg.color, ac = (this.skin && this.skin.accent) || this.cfg.accent, sk = "#f2c49b", dk = "#222", W = this.flash % 4 > 1;
     const R = (x, y, w, h, col) => { g.fillStyle = W ? "#fff" : col; g.fillRect(x, y, w, h); };
     const head = (hy, hx = 0) => { R(-5 + hx, hy, 11, 11, sk); R(-6 + hx, hy - 1, 13, 4, ac); R(3 + hx, hy + 4, 2, 2, "#000"); };
     if (pose === "down" || pose === "fall") { if (pose === "fall") g.rotate(-0.5); R(-24, -7, 20, 6, c); R(-4, -10, 16, 10, c); R(-4, -10, 3, 10, ac); R(12, -11, 10, 10, sk); R(20, -12, 3, 11, ac); return; }
@@ -234,10 +235,32 @@ class Fighter {
     }
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = ac + "66"; g.fillRect(-14, -60, 6, 50); }
   }
+  // ---- SKINS ----
+  // skin = { nome, pasta } -> usa imagens com o mesmo nome de arquivo dentro da pasta
+  //        { nome, troca: [{ faixa: [h1, h2], matiz, sat, luz }] } -> troca de paleta (matiz em graus)
+  //        { nome, color, accent } -> cores dos personagens desenhados por código
+  tex(path) {
+    const sk = this.skin; if (!path) return null;
+    if (sk && sk.pasta) { const alt = Fighter.load(sk.pasta + path.split("/").pop()); if (alt) return alt; }
+    const im = Fighter.load(path); if (!im || !sk || !sk.troca) return im;
+    const key = path + "|" + this.cfg.name + "|" + sk.nome; if (Fighter.skinCache[key]) return Fighter.skinCache[key];
+    const c = document.createElement("canvas"); c.width = im.width; c.height = im.height; const x = c.getContext("2d"); x.drawImage(im, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height), a = d.data;
+    for (let i = 0; i < a.length; i += 4) { if (!a[i + 3]) continue;
+      const r = a[i] / 255, gg = a[i + 1] / 255, b = a[i + 2] / 255, mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), l = (mx + mn) / 2, dd = mx - mn;
+      if (dd < 0.06) continue; const s = dd / (1 - Math.abs(2 * l - 1));
+      let h = mx === r ? ((gg - b) / dd) % 6 : mx === gg ? (b - r) / dd + 2 : (r - gg) / dd + 4; h = (h * 60 + 360) % 360;
+      const t = sk.troca.find(t => t.faixa[0] <= t.faixa[1] ? h >= t.faixa[0] && h <= t.faixa[1] : h >= t.faixa[0] || h <= t.faixa[1]); if (!t || s < (t.minSat ?? 0.12)) continue;
+      const H = t.matiz ?? h, S = Math.min(1, s * (t.sat ?? 1)), L = Math.min(1, l * (t.luz ?? 1)), C = (1 - Math.abs(2 * L - 1)) * S, X = C * (1 - Math.abs((H / 60) % 2 - 1)), m = L - C / 2;
+      const [r1, g1, b1] = H < 60 ? [C, X, 0] : H < 120 ? [X, C, 0] : H < 180 ? [0, C, X] : H < 240 ? [0, X, C] : H < 300 ? [X, 0, C] : [C, 0, X];
+      a[i] = (r1 + m) * 255; a[i + 1] = (g1 + m) * 255; a[i + 2] = (b1 + m) * 255; }
+    x.putImageData(d, 0, 0); return (Fighter.skinCache[key] = c);
+  }
+  static skinCache = {};
   static load(src) { const c = Fighter.cache[src] || (Fighter.cache[src] = Object.assign(new Image(), { src: src + "?v=" + (window.BUILD || 1) })); return c.complete && c.naturalWidth ? c : null; }
   // Lutador por partes (pixels da arte original): tronco por pose + pernas que giram no quadril
   drawParts(g, x, y, f, pose) {
-    const b = this.cfg.parts, I = n => Fighter.load(b + n + ".png");
+    const b = this.cfg.parts, I = n => this.tex(b + n + ".png");
     const win = I("win"), legL = I("leg_l"), legR = I("leg_r");
     const up = I(["punch", "cpunch", "jpunch"].includes(pose) ? "punch" : ["upper", "cupper"].includes(pose) ? "upper" : ["block", "cblock"].includes(pose) ? "block" : "guard");
     if (!win || !legL || !legR || !up) return;
@@ -259,7 +282,8 @@ class Fighter {
     const leg = (im, lx, r, s2) => { g.save(); g.translate(lx + im.width / 2, hipY); g.rotate(r); g.scale(1, s2); g.drawImage(im, -im.width / 2, 0); g.restore(); };
     g.translate(dx, 0);
     leg(legL, ox + M.legX[0], rl, sy); leg(legR, ox + M.legX[1], rr, rr < -1 ? 1 : sy);
-    g.save(); g.translate(0, hipY + 2); g.rotate(rot); g.drawImage(up, ox, -up.height); g.restore();
+    const bob = pose === "idle" ? Math.floor(this.anim / 15) % 2 : 0;  // respiração (igual ao Maués)
+    g.save(); g.translate(0, hipY + 2 + bob); g.rotate(rot); g.drawImage(up, ox, -up.height); g.restore();
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = this.cfg.accent + "88"; g.fillRect(-30, -110, 12, 90); }
     g.restore();
   }
@@ -299,7 +323,7 @@ class Fighter {
     else if (pose === "fall") { g.translate(30, -14); g.rotate(-1.1); pose = "lying"; }
     let ly = top + ih, rot = 0; const bob = pose === "idle" ? Math.floor(this.anim / 15) % 2 : 0, L = ox + legX[0], Rr = ox + legX[1];
     const lean = ["punch", "cpunch", "jpunch"].includes(pose), crouchP = ["crouch", "cpunch", "ckick", "cblock", "cupper"].includes(pose);
-    const punchIm = lean && this.cfg.punchSprite ? Fighter.load(this.cfg.punchSprite) : null;
+    const punchIm = lean && this.cfg.punchSprite ? this.tex(this.cfg.punchSprite) : null;
     if (lean) { g.translate(punchIm ? 3 : 8, 0); rot = punchIm ? 0.03 : 0.08; }
     if (pose === "hit") { g.translate(-5, 0); rot = -0.12; }
     if (pose === "upper" || pose === "win" || pose === "cupper") rot = -0.08;
