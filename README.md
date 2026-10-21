@@ -39,6 +39,7 @@ pode receber no máximo 2 golpes de "juggle" (gancho/super). Melhor de 3 rounds,
 | Lutador | Vel/For/Vida | Especiais |
 |---|---|---|
 | Maués | 9/6/7 | Taco Voador (taco de hóquei girando), Gancho do Maués, Furacão de Chinelo, SUPER TACADA |
+| Milk | 5/6/8 | Pituxo (garrafa de gin azul girando), Gancho do Milk, Barrigada Giratória, SUPER PITUXO |
 | João Pedro | 3/7/8 | Granada, Gancho de Comando, Rajada de Coturno, BOMBARDEIO TÁTICO |
 | Lutador 3 | 4/9/8 | Pedrada, Gancho de Pedra, Rolo Compressor, Terremoto Total |
 | Lutador 4 | 7/7/4 | Raio Roxo, Gancho Voador, Pião Roxo, Fúria Violeta |
@@ -109,3 +110,11 @@ Hoje todo personagem tem só a skin `Original`. Para adicionar roupas novas:
 2. Adicione `{ nome: "...", pasta: "assets/skins/<nome>/" }` na lista `skins` do personagem.
 
 Com mais de uma skin, ▲/▼ troca a skin na seleção (no Versus: W/S para o P1 e ▲/▼ para o P2), e num espelho o P2 recebe outra skin automaticamente. Com uma skin só, a dica não aparece e os dois lados usam a Original, sem tingimento.
+
+## Milk e Clube Chalézinho
+- O Milk veio de uma arte do Gemini (`assets/milk_ref_gemini.png`). Foi normalizado em 42x93 na grade nativa e é escalado para 87 px (1,78 m). As peças ficam em `assets/milk/` e são geradas por `tools/gerar_milk.py`.
+- O projétil é `assets/milk_pituxo.png`.
+- Arquétipo: tanque de meio-campo. Na simulação: Milk 50,7% x Maués e 49,3% x João.
+- Cenário novo: `Clube Chalézinho` (`assets/stage_clube_chalezinho.png`, chão em groundY 163). No Arcade, os cenários se alternam a cada luta.
+- Frases de vitória: `quotes` (lista; o jogo sorteia uma) ou `quote`. Ficam editáveis na aba Frases da planilha.
+- Cartaz-resumo: `python3 tools/poster.py` gera `screens/resumo_jogo.png`.

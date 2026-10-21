@@ -36,6 +36,7 @@ def exportar():
       "2. Não mude a coluna Nome (é ela que liga a linha ao personagem). Não apague linhas.",
       "3. Salve a planilha (formato .xlsx, mesmo nome, mesma pasta: kit/personagens.xlsx).",
       "4. No terminal, na pasta do jogo:  python3 tools/planilha.py importar",
+      "   Frases de vitória: aba Frases (uma por linha; o jogo sorteia uma).",
       "5. Troque o número BUILD no index.html e publique. Pronto!","",
       "Dicas de balanceamento:",
       "- Velocidade, Força e Vida vão de 1 a 10. Vida real = 60 + Vida × 8. Dano real = dano base × (0,6 + Força × 0,09).",
@@ -46,11 +47,11 @@ def exportar():
         ws.append([l])
     ws.column_dimensions['A'].width=110; ws['A1'].font=Font(bold=True,size=14)
     p=wb.create_sheet('Personagens')
-    cab(p,['Nome','Altura (m)','Velocidade (1-10)','Força (1-10)','Vida (1-10)','Vida real (HP)','Pontos totais','Cor (#hex)','Cor destaque (#hex)','Projétil (desenho)','Frase de vitória'],[16,11,12,11,11,12,11,12,14,14,48])
+    cab(p,['Nome','Altura (m)','Velocidade (1-10)','Força (1-10)','Vida (1-10)','Vida real (HP)','Pontos totais','Cor (#hex)','Cor destaque (#hex)','Projétil (desenho)'],[16,11,12,11,11,12,11,12,14,14])
     dv=DataValidation(type='whole',operator='between',formula1='1',formula2='10',showErrorMessage=True,error='Use um número de 1 a 10'); p.add_data_validation(dv)
     for i,c in enumerate(C,start=2):
-        st=c['stats']; p.append([c['name'],c.get('alturaReal'),st['speed'],st['power'],st['health'],f'=60+E{i}*8',f'=C{i}+D{i}+E{i}',c.get('color'),c.get('accent'),c.get('projectile') or '',c.get('quote','')])
-        for col in 'BCDEHIK': p[f'{col}{i}'].fill=ED
+        st=c['stats']; p.append([c['name'],c.get('alturaReal'),st['speed'],st['power'],st['health'],f'=60+E{i}*8',f'=C{i}+D{i}+E{i}',c.get('color'),c.get('accent'),c.get('projectile') or ''])
+        for col in 'BCDEHI': p[f'{col}{i}'].fill=ED
         dv.add(f'C{i}:E{i}')
     e=wb.create_sheet('Especiais')
     cab(e,['Nome','Tipo','Comando','Nome do golpe','Dano base','Início (frames)','Ativo (frames)','Recuperação (frames)','Velocidade (×)','Acertos','Chave'],[16,18,26,24,10,11,11,13,12,9,10])
@@ -61,6 +62,13 @@ def exportar():
             for col in 'DEFGHIJ': e[f'{col}{r}'].fill=ED
             r+=1
     e.column_dimensions['K'].hidden=True
+    fr=wb.create_sheet('Frases')
+    cab(fr,['Nome','Frase de vitória (uma por linha; o jogo sorteia uma)'],[16,90])
+    r=2
+    for c in C:
+        for q in (c.get('quotes') or [c.get('quote','')]):
+            fr.append([c['name'],q]); fr[f'B{r}'].fill=ED; r+=1
+    fr.append([]); fr.append(['(para adicionar uma frase, insira uma linha com o Nome do personagem e a frase)'])
     b=wb.create_sheet('Golpes básicos (ref.)')
     cab(b,['Golpe','Dano','Início','Ativo','Recuperação','Altura'],[14,8,8,8,12,10])
     mv=subprocess.run(['node','-e',open(FIG,encoding='utf-8').read().split('const FREE')[0]+';process.stdout.write(JSON.stringify(MOVES))'],capture_output=True,text=True).stdout
@@ -89,7 +97,6 @@ def importar():
         for i,k in ((7,'color'),(8,'accent')):
             if row[i] and re.fullmatch(r'#[0-9a-fA-F]{6}',str(row[i]).strip()): d[k]=str(row[i]).strip()
             elif row[i]: sys.exit(f'erro: {nome}: cor inválida "{row[i]}" (use #RRGGBB)')
-        if row[10]: d['quote']=str(row[10])
         dados[nome]=d
     for row in wb['Especiais'].iter_rows(min_row=2,values_only=True):
         if not row or not row[0]: continue
@@ -108,6 +115,13 @@ def importar():
         if k=='fireball': mv.pop('a',None)
         if k=='super': mv.pop('a',None)
         d['moves'][k]={x:y for x,y in mv.items() if PADRAO[k].get('hits' if x=='maxHits' else x)!=y}
+    if 'Frases' in wb.sheetnames:
+        for row in wb['Frases'].iter_rows(min_row=2,values_only=True):
+            if not row or not row[0] or len(row)<2 or not row[1]: continue
+            nome=str(row[0]).strip()
+            if nome in dados: dados[nome].setdefault('quotes',[]).append(str(row[1]).strip())
+        for d in dados.values():
+            if d.get('quotes'): d['quote']=d['quotes'][0]
     bloco=(INI+'\nconst PLANILHA = '+json.dumps(dados,ensure_ascii=False,indent=1)+';\n'
       'PLANILHA && CHARACTERS.forEach(c => { const d = PLANILHA[c.name]; if (!d) return; const { stats, specials, moves, ...resto } = d;\n'
       '  Object.assign(c, resto); if (stats) c.stats = { ...c.stats, ...stats }; if (specials) c.specials = { ...c.specials, ...specials };\n'

@@ -286,6 +286,7 @@ function pauseMenu() {
   if (P("back")) { game.paused = false; Audio8.stopMusic(); game.screen = "title"; game.coin = 1; }
 }
 function endMatch(w) { game.matchWinner = w; game.screen = "quote"; game.qT = 0; Audio8.stopMusic(); if (game.mode === "versus" || w === 0) Audio8.win(); else Audio8.ko(); }
+const FRASE_PADRAO = "Vitória!";  // usada se o personagem não tiver frase
 function quote() {
   const t = ++game.qT, w = game.matchWinner, c = CHARACTERS[game.sel[w]];
   g.fillStyle = "#000"; g.fillRect(0, 0, W, H); g.fillStyle = c.color; g.fillRect(0, 20, 130, 140);
@@ -293,12 +294,13 @@ function quote() {
   portrait(game.sel[w], 65, 150, 2.4, "win", 1, 0, skinFor(w));
   txt(c.name.toUpperCase(), 140, 40, 12, "#ffd23f", "left");
   g.fillStyle = "#111"; g.fillRect(138, 56, 174, 60); g.strokeStyle = "#fff"; g.lineWidth = 1; g.strokeRect(138.5, 56.5, 173, 59);
-  const q = "“" + c.quote + "”", shown = q.slice(0, Math.floor(t / 2)); const words = shown.split(" "); let line = "", ly = 68;
+  const L = (c.quotes && c.quotes.length ? c.quotes : [c.quote || FRASE_PADRAO]); if (game.qPick == null || game.qT === 1) game.qPick = Math.floor(Math.random() * L.length);
+  const q = "“" + L[game.qPick % L.length] + "”", shown = q.slice(0, Math.floor(t / 2)); const words = shown.split(" "); let line = "", ly = 68;
   words.forEach(wd => { if ((line + wd).length > 26) { txt(line, 146, ly, 7, "#fff", "left", null, 0); line = ""; ly += 11; } line += wd + " "; }); txt(line, 146, ly, 7, "#fff", "left", null, 0);
   if (t > 60 && game.frame % 30 < 20) txt("ENTER", 225, 150, 8, "#8cf");
   if (t > 40 && P("ok") || t > 420) {
     if (game.mode !== "arcade") { game.screen = "select"; game.ready = [false, false]; if (game.mode === "free" && game.randomCPU) game.sel[1] = RANDOM; }
-    else if (w === 0) { if (game.ladderPos >= game.ladder.length - 1) { game.screen = "ending"; game.eT = 0; Audio8.win(); } else { game.ladderPos++; game.sel[1] = game.ladder[game.ladderPos]; toVS(); } }
+    else if (w === 0) { if (game.ladderPos >= game.ladder.length - 1) { game.screen = "ending"; game.eT = 0; Audio8.win(); } else { game.ladderPos++; game.sel[1] = game.ladder[game.ladderPos]; { const ok = STAGES.map((s, i) => i).filter(i => !STAGES[i].locked); game.stageSel = ok[(ok.indexOf(game.stageSel) + 1) % ok.length]; } toVS(); /* arcade alterna cenários */ } }
     else { game.screen = "continue"; game.cT = 600; }
   }
 }

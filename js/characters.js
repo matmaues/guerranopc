@@ -7,11 +7,12 @@
 // skins: roupas. { nome: "Original" } = visual padrão; { nome, pasta: "assets/skins/x/" } usa imagens próprias com os mesmos nomes de arquivo
 //   (veja assets/skins/LEIA-ME.txt). Com 2+ skins, ▲/▼ troca na seleção e o espelho dá outra skin ao P2; com 1 só, os dois usam a Original.
 // moves: ajustes por personagem dos especiais (editáveis na planilha kit/personagens.xlsx): fireball/super { dmg, vel, hits }, dp/spin { dmg, s, a, r, maxHits }.
-// quote: frase de vitória. boss: true = Chefão (último da escada do Arcade; selecionável só no Versus). scale: tamanho do desenho.
+// quote: frase de vitória (padrão). quotes: lista de frases (sorteia uma por vitória; editável na aba Frases da planilha). boss: true = Chefão (último da escada do Arcade; selecionável só no Versus). scale: tamanho do desenho.
 // ALTURA: alturaReal (m) -> altura em jogo (px de arte, pés até o topo da cabeça, sem cabelo/chapéu alto)
 // 1,80 m = 88 px; ±3 px a cada 5 cm; limite 80–96 px. alturaArte = altura do sprite em 1:1 (o jogo escala).
 function alturaPx(c) { return c.alturaReal ? Math.max(80, Math.min(96, Math.round(88 + (c.alturaReal - 1.80) / 0.05 * 3))) : 88; }
 function alturaTxt(c) { return c.alturaReal ? c.alturaReal.toFixed(2).replace(".", ",") + " m" : ""; }
+// Milk: tanque de meio-campo (VEL 5, FOR 6, VID 8). Sim 140 lutas: Milk 50,7% x Maués, 49,3% x João.
 // BALANCEAMENTO: arquétipos diferentes. Maués = rápido/ágil, golpes mais fracos; João = lento, mais forte e resistente.
 // Medido com tools/sim (CPU x CPU nível 4, 200 lutas, lados alternados): Maués 47,5% x João 52,5%.
 const CHARACTERS = [
@@ -23,6 +24,11 @@ const CHARACTERS = [
   { name: "João Pedro", alturaReal: 1.78, alturaArte: 77, color: "#4a5530", accent: "#3fa34d", stats: { speed: 3, power: 7, health: 8 }, sprite: null, parts: "assets/joao/", partsMeta: { ox: -21, legX: [8, 22] }, projectile: "granada",
     specials: { fireball: "GRANADA", dp: "GANCHO DE COMANDO", spin: "RAJADA DE COTURNO", super: "BOMBARDEIO TÁTICO" },
     quote: "Missão cumprida. Próximo da fila!",
+    skins: [{ nome: "Original" }] },
+  { name: "Milk", alturaReal: 1.78, alturaArte: 93, color: "#5b3fa0", accent: "#f4f4ff", stats: { speed: 5, power: 6, health: 8 }, sprite: null, parts: "assets/milk/", partsMeta: { ox: -21, legX: [8, 23] },
+    projectile: "pituxo", projSprite: "assets/milk_pituxo.png", projR: 7,
+    specials: { fireball: "PITUXO", dp: "GANCHO DO MILK", spin: "BARRIGADA GIRATÓRIA", super: "SUPER PITUXO" },
+    quote: "Toma leite que passa!", quotes: ["Toma leite que passa!", "Um Pituxo pra comemorar!", "Barriga de respeito, golpe de respeito."],
     skins: [{ nome: "Original" }] },
   { name: "Lutador 3", color: "#3bd16f", accent: "#1a1a1a", stats: { speed: 4, power: 9, health: 8 }, sprite: null,
     specials: { fireball: "PEDRADA", dp: "GANCHO DE PEDRA", spin: "ROLO COMPRESSOR", super: "TERREMOTO TOTAL" },
@@ -48,7 +54,6 @@ const PLANILHA = {
   "alturaReal": 1.8,
   "color": "#1f4fc4",
   "accent": "#ffd23f",
-  "quote": "Chinelo branco não perdoa ninguém!",
   "specials": {
    "fireball": "TACO VOADOR",
    "dp": "GANCHO DO MAUÉS",
@@ -60,7 +65,11 @@ const PLANILHA = {
    "dp": {},
    "spin": {},
    "super": {}
-  }
+  },
+  "quotes": [
+   "Chinelo branco não perdoa ninguém!"
+  ],
+  "quote": "Chinelo branco não perdoa ninguém!"
  },
  "João Pedro": {
   "stats": {
@@ -71,7 +80,6 @@ const PLANILHA = {
   "alturaReal": 1.78,
   "color": "#4a5530",
   "accent": "#3fa34d",
-  "quote": "Missão cumprida. Próximo da fila!",
   "specials": {
    "fireball": "GRANADA",
    "dp": "GANCHO DE COMANDO",
@@ -83,7 +91,39 @@ const PLANILHA = {
    "dp": {},
    "spin": {},
    "super": {}
-  }
+  },
+  "quotes": [
+   "Missão cumprida. Próximo da fila!"
+  ],
+  "quote": "Missão cumprida. Próximo da fila!"
+ },
+ "Milk": {
+  "stats": {
+   "speed": 5,
+   "power": 6,
+   "health": 8
+  },
+  "alturaReal": 1.78,
+  "color": "#5b3fa0",
+  "accent": "#f4f4ff",
+  "specials": {
+   "fireball": "PITUXO",
+   "dp": "GANCHO DO MILK",
+   "spin": "BARRIGADA GIRATÓRIA",
+   "super": "SUPER PITUXO"
+  },
+  "moves": {
+   "fireball": {},
+   "dp": {},
+   "spin": {},
+   "super": {}
+  },
+  "quotes": [
+   "Toma leite que passa!",
+   "Um Pituxo pra comemorar!",
+   "Barriga de respeito, golpe de respeito."
+  ],
+  "quote": "Toma leite que passa!"
  },
  "Lutador 3": {
   "stats": {
@@ -93,7 +133,6 @@ const PLANILHA = {
   },
   "color": "#3bd16f",
   "accent": "#1a1a1a",
-  "quote": "Força bruta resolve tudo.",
   "specials": {
    "fireball": "PEDRADA",
    "dp": "GANCHO DE PEDRA",
@@ -105,7 +144,11 @@ const PLANILHA = {
    "dp": {},
    "spin": {},
    "super": {}
-  }
+  },
+  "quotes": [
+   "Força bruta resolve tudo."
+  ],
+  "quote": "Força bruta resolve tudo."
  },
  "Lutador 4": {
   "stats": {
@@ -115,7 +158,6 @@ const PLANILHA = {
   },
   "color": "#b03be8",
   "accent": "#ff9ff3",
-  "quote": "Volte quando treinar mais.",
   "specials": {
    "fireball": "RAIO ROXO",
    "dp": "GANCHO VOADOR",
@@ -127,7 +169,11 @@ const PLANILHA = {
    "dp": {},
    "spin": {},
    "super": {}
-  }
+  },
+  "quotes": [
+   "Volte quando treinar mais."
+  ],
+  "quote": "Volte quando treinar mais."
  },
  "Chefão": {
   "stats": {
@@ -137,7 +183,6 @@ const PLANILHA = {
   },
   "color": "#2b2b33",
   "accent": "#e83b3b",
-  "quote": "Ninguém derruba o Chefão!",
   "specials": {
    "fireball": "BOLA SOMBRIA",
    "dp": "GANCHO DO CHEFÃO",
@@ -149,7 +194,11 @@ const PLANILHA = {
    "dp": {},
    "spin": {},
    "super": {}
-  }
+  },
+  "quotes": [
+   "Ninguém derruba o Chefão!"
+  ],
+  "quote": "Ninguém derruba o Chefão!"
  }
 };
 PLANILHA && CHARACTERS.forEach(c => { const d = PLANILHA[c.name]; if (!d) return; const { stats, specials, moves, ...resto } = d;
