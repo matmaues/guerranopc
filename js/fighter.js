@@ -194,7 +194,7 @@ class Fighter {
     let f = this.facing; const pose = this.pose();
     if (pose === "spin" && Math.floor(this.anim / 4) % 2) f = -f;
     g.fillStyle = "#0006"; g.fillRect(x - 12 * s, (this.inFight ? GROUND : y) + 1, 24 * s, 3);
-    if (this.cfg.puppet) return this.drawPuppet(g, x, y, f, pose);
+    if (this.cfg.parts) return this.drawParts(g, x, y, f, pose);
     if (this.img && this.cfg.spriteLegs) return this.drawLegged(g, x, y, f, pose);
     g.save(); g.translate(x, y); g.scale(f * s, s); this.drawProc(g, pose); g.restore();
   }
@@ -228,12 +228,31 @@ class Fighter {
     }
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = ac + "66"; g.fillRect(-14, -60, 6, 50); }
   }
-  drawPuppet(g, x, y, f, pose) {
-    const v = pose === "walk" ? Math.floor(this.anim / 8) % 2 : pose === "idle" ? Math.floor(this.anim / 16) % 2 : 0;
-    const pp = pose === "fall" ? "down" : pose, im = Puppet.frame(this.cfg.puppet, pp, v, this.m && this.m.heavy);
+  static load(src) { const c = Fighter.cache[src] || (Fighter.cache[src] = Object.assign(new Image(), { src })); return c.complete && c.naturalWidth ? c : null; }
+  // Lutador por partes (pixels da arte original): tronco por pose + pernas que giram no quadril
+  drawParts(g, x, y, f, pose) {
+    const b = this.cfg.parts, I = n => Fighter.load(b + n + ".png");
+    const win = I("win"), legL = I("leg_l"), legR = I("leg_r");
+    const up = I(["punch", "cpunch", "jpunch"].includes(pose) ? "punch" : ["upper", "cupper"].includes(pose) ? "upper" : ["block", "cblock"].includes(pose) ? "block" : "guard");
+    if (!win || !legL || !legR || !up) return;
     g.save(); g.translate(x, y); g.scale(f * 0.5, 0.5); if (this.flash % 4 > 1) g.globalAlpha = 0.5;
-    if (pose === "down" || pose === "fall") { g.rotate(pose === "fall" ? -1.0 : -Math.PI / 2); g.translate(8, 0); }
-    g.drawImage(im, -Puppet.HX, -Puppet.FEET);
+    if (pose === "down" || pose === "fall") { g.rotate(pose === "fall" ? -1.0 : -Math.PI / 2); g.drawImage(win, -win.width / 2 + 6, -win.height + 4); g.restore(); return; }
+    if (pose === "win") { g.drawImage(win, -win.width / 2, -win.height); g.restore(); return; }
+    const LH = legL.height, ox = -15, heavy = this.m && this.m.heavy;
+    let hipY = -LH + 2, rot = 0, dx = 0, sy = 1, rl = 0, rr = 0;
+    const crouchP = ["crouch", "cpunch", "ckick", "cblock", "cupper"].includes(pose), air = ["jump", "jpunch", "jkick", "upper"].includes(pose);
+    if (crouchP) { sy = 0.6; hipY = -LH * 0.6 + 2; }
+    if (air) { sy = 0.8; rl = -0.35; rr = -0.75; hipY = -LH + 2; }
+    if (pose === "walk") { const w = Math.floor(this.anim / 7) % 2 ? 0.2 : -0.2; rl = w; rr = -w; }
+    if (pose === "kick" || pose === "spin") { rr = heavy ? -1.85 : -1.5; rl = 0.12; rot = -0.15; }
+    if (pose === "jkick") rr = -1.1;
+    if (pose === "ckick") { rr = -1.5; sy = 0.6; }
+    if (pose === "hit") { dx = -5; rot = -0.12; }
+    if (["punch", "cpunch", "jpunch"].includes(pose)) { dx = 3; rot = 0.05; }
+    const leg = (im, lx, r, s2) => { g.save(); g.translate(lx + im.width / 2, hipY); g.rotate(r); g.scale(1, s2); g.drawImage(im, -im.width / 2, 0); g.restore(); };
+    g.translate(dx, 0);
+    leg(legL, ox + 1, rl, sy); leg(legR, ox + 12, rr, rr < -1 ? 1 : sy);
+    g.save(); g.translate(0, hipY + 2); g.rotate(rot); g.drawImage(up, ox, -up.height); g.restore();
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = this.cfg.accent + "88"; g.fillRect(-30, -110, 12, 90); }
     g.restore();
   }
@@ -253,7 +272,8 @@ class Fighter {
     if (pose === "down" || pose === "fall") { g.rotate(pose === "fall" ? -1.1 : -Math.PI / 2); g.drawImage(im, -ih / 2 + 10, ox - 10); g.restore(); return; }
     let ly = top + ih, rot = 0; const bob = pose === "idle" ? Math.floor(this.anim / 15) % 2 : 0, L = ox + legX[0], Rr = ox + legX[1];
     const lean = ["punch", "cpunch", "jpunch"].includes(pose), crouchP = ["crouch", "cpunch", "ckick", "cblock", "cupper"].includes(pose);
-    if (lean) { g.translate(8, 0); rot = 0.08; }
+    const punchIm = lean && this.cfg.punchSprite ? Fighter.load(this.cfg.punchSprite) : null;
+    if (lean) { g.translate(punchIm ? 3 : 8, 0); rot = punchIm ? 0.03 : 0.08; }
     if (pose === "hit") { g.translate(-5, 0); rot = -0.12; }
     if (pose === "upper" || pose === "win" || pose === "cupper") rot = -0.08;
     if (crouchP) { ly += 12; leg(L - 2, ly, LEN - 12); if (pose === "ckick") hLeg(Rr + 5, ly + LEN - 6); else leg(Rr + 2, ly, LEN - 12); }
@@ -262,8 +282,8 @@ class Fighter {
     else if (pose === "kick" || pose === "spin") { leg(L - 4, ly, LEN); rot = -0.18; hLeg(Rr + 5, ly + 2); }
     else if (pose === "walk") { const w = Math.floor(this.anim / 7) % 2 ? 3 : -3; leg(L + w, ly - (w > 0 ? 2 : 0), LEN); leg(Rr - w, ly - (w < 0 ? 2 : 0), LEN); }
     else { leg(L, ly, LEN); leg(Rr, ly, LEN); }
-    g.save(); g.translate(0, ly + bob); g.rotate(rot); g.drawImage(im, ox, -ih); g.restore();
-    if (lean && this.m) { const a = this.cfg.accent; R(a, iw / 2 + 4, ly - ih + 30, 10, 2); R(a, iw / 2 + 8, ly - ih + 36, 8, 2); R("#fff", iw / 2 + 2, ly - ih + 24, 6, 2); }
+    g.save(); g.translate(0, ly + bob); g.rotate(rot); g.drawImage(punchIm || im, ox, -ih); g.restore();
+    if (lean && this.m && !punchIm) { const a = this.cfg.accent; R(a, iw / 2 + 4, ly - ih + 30, 10, 2); R(a, iw / 2 + 8, ly - ih + 36, 8, 2); R("#fff", iw / 2 + 2, ly - ih + 24, 6, 2); }
     if (pose === "block" || pose === "cblock") { g.globalAlpha = 0.6; R("#7fd8ff", iw / 2 + 2, ly - ih + 14, 4, 40); g.globalAlpha = 1; }
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = this.cfg.accent + "88"; g.fillRect(-30, -110, 12, 90); }
     g.restore();

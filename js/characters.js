@@ -1,15 +1,16 @@
 // ===== CONFIGURAÇÃO DOS PERSONAGENS =====
 // name: nome | color/accent: cores | stats (1-10): speed (velocidade), power (força), health (vida)
-// puppet: boneco pixel-art desenhado em js/puppet.js ("maues" ou "joao").
+// parts: pasta com sprites por partes (guard/punch/upper/block = tronco, leg_l/leg_r = pernas, win = corpo inteiro).
+// punchSprite: versão do tronco com o braço esticado (usada no soco).
 // sprite: caminho da imagem (null = desenho procedural). spriteLegs: true se a imagem é só do tronco (o jogo desenha as pernas).
 // specials: nomes dos golpes especiais (os comandos são iguais para todos).
 // quote: frase de vitória. boss: true = Chefão (último da escada do Arcade; selecionável só no Versus). scale: tamanho do desenho.
 const CHARACTERS = [
   { name: "Maués", color: "#1f4fc4", accent: "#ffd23f", stats: { speed: 6, power: 7, health: 6 },
-    puppet: "maues", sprite: null, projectile: "chinelo",
+    sprite: "assets/maues.png", spriteLegs: true, skin: "#e9a57e", legX: [9, 24], punchSprite: "assets/maues_punch.png", projectile: "chinelo",
     specials: { fireball: "CHINELADA", dp: "GANCHO DO MAUÉS", spin: "FURACÃO DE CHINELO", super: "SUPER CHINELADA" },
     quote: "Chinelo branco não perdoa ninguém!" },
-  { name: "João Pedro", color: "#4a5530", accent: "#3fa34d", stats: { speed: 4, power: 8, health: 9 }, puppet: "joao", sprite: null, projectile: "granada",
+  { name: "João Pedro", color: "#4a5530", accent: "#3fa34d", stats: { speed: 4, power: 8, health: 9 }, sprite: null, parts: "assets/joao/", projectile: "granada",
     specials: { fireball: "GRANADA", dp: "GANCHO DE COMANDO", spin: "RAJADA DE COTURNO", super: "BOMBARDEIO TÁTICO" },
     quote: "Missão cumprida. Próximo da fila!" },
   { name: "Lutador 3", color: "#3bd16f", accent: "#1a1a1a", stats: { speed: 4, power: 9, health: 8 }, sprite: null,

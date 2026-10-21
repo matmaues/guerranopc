@@ -46,7 +46,8 @@ pode receber no máximo 2 golpes de "juggle" (gancho/super). Melhor de 3 rounds,
 
 Campos de cada lutador: `name`, `color`/`accent`, `stats` (1-10), `specials` (nomes), `quote` (frase de vitória), `projectile`
 (`chinelo`, `granada` ou padrão), `boss`, `scale`, e o visual:
-- `puppet: "maues"` / `"joao"`: bonecos pixel-art desenhados pixel a pixel em `js/puppet.js` (todas as poses: guarda, andar, soco, chute, agachar, pulo, gancho, apanhar, K.O., vitória). Cores e detalhes (óculos, bigode, camisa azul com detalhes brancos, short branco, relógio, chinelos; boina com estrela verde, camuflado, emblema, coturnos) ficam em `STYLES` nesse arquivo.
+- `sprite` + `spriteLegs: true` + `punchSprite` (Maués): tronco com os pixels exatos da arte original (`assets/maues.png`), pernas e chinelos brancos desenhados pelo jogo, e `assets/maues_punch.png` com o braço esticado no mesmo estilo para os socos.
+- `parts: "assets/joao/"` (João Pedro): pixels da arte original divididos em partes — tronco em guarda/soco/gancho/defesa (braços de luta pintados no mesmo camuflado), pernas `leg_l`/`leg_r` que giram no quadril para chutes, e `win.png` (braços cruzados originais) para vitória.
 - `sprite: "assets/arquivo.png"`: imagem própria (fundo transparente, virada para a direita). Com `spriteLegs: true` a imagem é só do tronco e o jogo desenha pernas.
 - nenhum dos dois: boneco procedural simples (como Lutador 3/4).
 
@@ -56,7 +57,6 @@ Campos de cada lutador: `name`, `color`/`accent`, `stats` (1-10), `specials` (no
 ## Estrutura
 - `js/input.js` – teclado/toque, mapas `CONTROLS` (P1, P2) e leitura de comandos com buffer (meias-luas, gancho)
 - `js/fighter.js` – golpes (tabela `MOVES`), hit/block stun, combos, agarrão, knockdown, desenho
-- `js/puppet.js` – bonecos pixel-art (Maués, João Pedro)
 - `js/ai.js` – CPU (anti-aéreo, defesa alta/baixa, combos, especiais, super; fica mais forte a cada luta do Arcade)
 - `js/audio.js` – sons chiptune, "voz" sintética do locutor (ROUND, FIGHT, K.O., PERFECT) e música — tudo gerado por WebAudio
 - `js/game.js` – telas (título, seleção, cenário, VS, luta, pausa, frase de vitória, continue, final), HUD e loop
