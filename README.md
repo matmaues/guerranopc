@@ -119,7 +119,10 @@ Com mais de uma skin, ▲/▼ troca a skin na seleção (no Versus: W/S para o P
 - Frases de vitória: `quotes` (lista; o jogo sorteia uma) ou `quote`. Ficam editáveis na aba Frases da planilha.
 - Cartaz-resumo: `python3 tools/poster.py` gera `screens/resumo_jogo.png`.
 
-## Novidades (BUILD 202610211530)
+## Novidades (BUILD 202610211600)
 - **Monte Pascoal**: terceiro cenário (`assets/stage_monte_pascoal.png`); entra na escolha de cenário e no rodízio do Arcade.
 - **CONTROLES**: no menu principal (e na pausa, tecla **C**) dá para trocar as teclas do P1 e do P2: escolha a ação, ENTER e aperte a nova tecla. Se a tecla já tiver dono, as duas trocam de lugar (aparece um aviso). Use **PADRÃO** para voltar às teclas originais e **SALVAR E VOLTAR** para guardar (fica salvo no navegador, em localStorage). Os botões de toque continuam valendo para o P1.
 - **Braços no estilo do Maués** para João Pedro e Milk (`tools/bracos.py`, que já roda no fim de `gerar_joao.py`/`gerar_milk.py`): braço da frente pendurado ao lado do corpo, braço de trás dobrado na barriga, soco com o braço inteiro saindo da manga, cotovelos fechados com contorno.
+- **BUILD 202610211600 — braços do Maués em todos**: João Pedro e Milk usam exatamente os pixels dos braços do Maués (`tools/bracos_maues.py`), só recoloridos (pele de cada um; manga camuflada no João, roxa no Milk). A versão anterior está na tag git `bracos-v2` (`tools/bracos.py`).
+- **BUILD 202610211600 — guardas próprias + punho detalhado**: relógio só no Maués. João Pedro: guarda de boxe militar (punhos no queixo, manga camuflada até o pulso). Milk: guarda de briguento (punhos baixos na barriga, um à frente). Montadas com as peças do braço do Maués sem esticar pixel (`tools/bracos3.py`). Punho fechado com nós, vincos dos dedos e polegar (`FIST` em `tools/bracos3.py`) no soco, gancho, super e guardas; o soco do Maués é gerado a partir de `assets/src/maues_punch_base.png`.
+- **BUILD 202610211600 — guarda natural**: João e Milk voltam ao braço dobrado do Maués (mesmos pixels), sem a mão/relógio dele: antebraço continua e termina no punho fechado detalhado. O braço pendurado também é o do Maués. Soco inalterado.

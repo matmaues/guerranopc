@@ -67,5 +67,5 @@ for i,k in enumerate(['guard','punch','upper','block','win']):
     sheet.alpha_composite(t.resize((t.width*4,t.height*4),0),(i*(W+PADR)*4,0))
 sheet.save('/tmp/milksheet.png')
 
-# braços no estilo do Maués (substitui guard/punch/upper/block)
-import runpy; runpy.run_path("tools/bracos.py")
+# braços = pixels do Maués recoloridos (substitui guard/punch/upper/block; versão antiga: tools/bracos.py, tag bracos-v2)
+import runpy; runpy.run_path("tools/bracos3.py")
