@@ -27,20 +27,23 @@ def outline(im):
     a=im.load(); o=im.copy(); b=o.load()
     for y in range(im.height):
         for x in range(im.width):
-            if a[x,y][3]==0 and any(0<=x+i<im.width and 0<=y+j<im.height and a[x+i,y+j][3] and sum(a[x+i,y+j][:3])>200 for i,j in((1,0),(-1,0),(0,1),(0,-1))): b[x,y]=OL
+            if a[x,y][3]==0 and any(0<=x+i<im.width and 0<=y+j<im.height and a[x+i,y+j][3] and sum(a[x+i,y+j][:3])>110 for i,j in((1,0),(-1,0),(0,1),(0,-1))): b[x,y]=OL
     return o
 def canvas(): return Image.new('RGBA',(W+PADR,HIP+2+PADT))
 def put(c,im,x,y): c.alpha_composite(im,(x,y+PADT))
 UPV=lambda im: im.transpose(Image.ROTATE_180).transpose(Image.FLIP_LEFT_RIGHT)   # aponta p/ cima, mão no topo
 FWD=lambda im: im.transpose(Image.ROTATE_90)                                       # horizontal, mão p/ frente
+UA=front.crop((0,0,front.width,10))            # braço (do fim da manga até o cotovelo)
+BUA=back.crop((0,0,back.width,6))
 def pose(kind):
     c=canvas(); put(c,body,0,0)
-    if kind=='block': put(c,FWD(back),12,40)
-    else: put(c,FWD(back),8,47)                    # braço de trás: antebraço p/ frente na barriga
-    if kind=='guard':   put(c,UPV(front),36,24)     # punho na altura do queixo
-    elif kind=='punch': put(c,FWD(front),36,38)     # soco esticado
-    elif kind=='upper': put(c,UPV(front),36,2)      # punho p/ cima
-    elif kind=='block': put(c,UPV(front),37,12)     # antebraço na frente do rosto
+    # braço de trás: manga -> braço curto -> cotovelo -> antebraço p/ frente na barriga
+    if kind=='block': put(c,BUA,1,46); put(c,FWD(back),3,48)
+    else: put(c,BUA,1,46); put(c,FWD(back),3,50)
+    if kind=='guard':   put(c,UA,36,46); put(c,UPV(front),36,32)     # cotovelo em baixo (y~56), punho no queixo
+    elif kind=='punch': put(c,FWD(front),36,38)                     # soco esticado (cotovelo encostado na manga)
+    elif kind=='upper': put(c,UA,36,46); put(c,UPV(front),36,24)     # punho p/ cima
+    elif kind=='block': put(c,UA,36,46); put(c,UPV(front),37,28)     # antebraço na frente do rosto
     return outline(c)
 import os; d='assets/milk/'; os.makedirs(d,exist_ok=True)
 for k in('guard','punch','upper','block'): pose(k).save(d+k+'.png')

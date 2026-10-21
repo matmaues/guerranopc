@@ -28,7 +28,7 @@ const CHARACTERS = [
   { name: "Milk", alturaReal: 1.78, alturaArte: 93, color: "#5b3fa0", accent: "#f4f4ff", stats: { speed: 5, power: 6, health: 8 }, sprite: null, parts: "assets/milk/", partsMeta: { ox: -21, legX: [8, 23] },
     projectile: "pituxo", projSprite: "assets/milk_pituxo.png", projR: 7,
     specials: { fireball: "PITUXO", dp: "GANCHO DO MILK", spin: "BARRIGADA GIRATÓRIA", super: "SUPER PITUXO" },
-    quote: "Toma leite que passa!", quotes: ["Toma leite que passa!", "Um Pituxo pra comemorar!", "Barriga de respeito, golpe de respeito."],
+    quote: "Pix sem taxa no pv", quotes: ["Pix sem taxa no pv"],
     skins: [{ nome: "Original" }] },
   { name: "Lutador 3", color: "#3bd16f", accent: "#1a1a1a", stats: { speed: 4, power: 9, health: 8 }, sprite: null,
     specials: { fireball: "PEDRADA", dp: "GANCHO DE PEDRA", spin: "ROLO COMPRESSOR", super: "TERREMOTO TOTAL" },
@@ -119,11 +119,9 @@ const PLANILHA = {
    "super": {}
   },
   "quotes": [
-   "Toma leite que passa!",
-   "Um Pituxo pra comemorar!",
-   "Barriga de respeito, golpe de respeito."
+   "Pix sem taxa no pv"
   ],
-  "quote": "Toma leite que passa!"
+  "quote": "Pix sem taxa no pv"
  },
  "Lutador 3": {
   "stats": {

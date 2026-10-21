@@ -35,7 +35,7 @@ def outline(im):
     a=im.load(); o=im.copy(); b=o.load()
     for y in range(im.height):
         for x in range(im.width):
-            if a[x,y][3]==0 and any(0<=x+i<im.width and 0<=y+j<im.height and a[x+i,y+j][3] and sum(a[x+i,y+j][:3])>200 for i,j in((1,0),(-1,0),(0,1),(0,-1))): b[x,y]=OL
+            if a[x,y][3]==0 and any(0<=x+i<im.width and 0<=y+j<im.height and a[x+i,y+j][3] and sum(a[x+i,y+j][:3])>110 for i,j in((1,0),(-1,0),(0,1),(0,-1))): b[x,y]=OL
     return o
 def canvas(): return Image.new('RGBA',(W+PADR,HIP+2+PADT))
 def put(c,im,x,y): c.alpha_composite(im,(x,y+PADT))
