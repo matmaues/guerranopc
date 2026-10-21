@@ -5,8 +5,8 @@
 from PIL import Image
 OL=(26,16,16,255)
 CFG={ # sy=ombro, hb=fim da mão, cl/cr = colunas de corte (braço esq x<cl, dir x>=cr), el=linha do cotovelo
- 'milk':dict(ref='assets/milk_ref_normalizado.png',HIP=75,PADR=34,PADT=16,sy=46,hb=73,cl=10,cr=37,el=57,px=37,py=39,uy=48),  # manga curta fica no tronco; braço sai da barra da manga
- 'joao':dict(ref='assets/joao_ref_normalizado.png',HIP=60,PADR=34,PADT=14,sy=36,hb=63,cl=10,cr=35,el=50,px=34,py=35,uy=40),  # manga comprida gira junto
+ 'milk':dict(ref='assets/milk_ref_normalizado.png',HIP=75,PADR=34,PADT=16,sy=46,hb=73,cl=10,cr=37,el=57,px=37,py=37,uy=50,tk=9,bl=1.35),  # manga curta fica no tronco; braço sai da barra da manga
+ 'joao':dict(ref='assets/joao_ref_normalizado.png',HIP=60,PADR=34,PADT=14,sy=36,hb=63,cl=10,cr=35,el=50,px=34,py=34,uy=42,tk=8,bl=1.35),  # manga comprida gira junto
 }
 def dark(p): return p[3] and sum(p[:3])<=110
 def outline(im):
@@ -54,12 +54,19 @@ def build(n):
         return outline(Lr)
     e=el-sy
     # braço de trás (esquerda da imagem) dobrado: parte de cima original, antebraço girado p/ frente
-    Lup=L.crop((0,0,cl,e+2)); Lfa=L.crop((0,e,cl,hb-sy)).transpose(Image.ROTATE_90)
-    def back(dy=0): return arm([(Lup,0,sy),(Lfa,max(1,cl-6),el-Lfa.height//2-1+dy)])
-    hang=arm([(R,cr,sy)])                                   # braço da frente pendurado (como o Maués)
-    def fwd(dy=0): return arm([(R.transpose(Image.ROTATE_90),c['px'],c['py']+dy)])      # soco: braço inteiro na horizontal
-    upr=arm([(R.transpose(Image.ROTATE_180),cr,c['uy']-R.height)])                    # gancho: braço p/ cima
-    poses={'guard':[back(),hang],'block':[back(-3),hang],'punch':[back(),fwd()],'upper':[back(),upr]}
+    def bb(im):  # recorta à caixa do conteúdo
+        b=im.getbbox(); return im.crop(b) if b else im
+    def thick(im,w,h): return strip_ol(bb(im)).resize((w,h),Image.NEAREST)   # engrossa/alonga sem borrar o pixel
+    bl=c['bl']
+    Lup0=bb(strip_ol(L.crop((0,0,cl,e+2)))); Lup=thick(Lup0,Lup0.width,round(Lup0.height*bl))     # braço mais comprido
+    Lfa0=bb(strip_ol(L.crop((0,e,cl,hb-sy)))); Lfa=thick(Lfa0,Lfa0.width+1,round(Lfa0.height*1.45)).transpose(Image.ROTATE_90)  # antebraço cruza mais
+    ex=L.getbbox()[0]
+    def back(dy=0): ey=sy+Lup.height; return arm([(Lup,ex+1,sy),(Lfa,ex+2,ey-Lfa.height+2+dy)])
+    hang=arm([(R,cr,sy)])
+    R0=bb(strip_ol(R)); RT=thick(R0,c['tk'],round(R0.height*1.15))   # braço de soco grosso (manga+braço+punho)                                   # braço da frente pendurado (como o Maués)
+    def fwd(dy=0): return arm([(RT.transpose(Image.ROTATE_90),c['px'],c['py']+dy)])      # soco: braço inteiro na horizontal
+    upr=arm([(RT.transpose(Image.ROTATE_180),cr-2,c['uy']-RT.height)])                    # gancho: braço p/ cima
+    poses={'guard':[back(-3),hang],'block':[back(-6),hang],'punch':[back(-3),fwd()],'upper':[back(-3),upr]}
     for k,ls in poses.items():
         cv=canvas(); put(cv,body,0,0)
         for l in ls: cv.alpha_composite(l)
