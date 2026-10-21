@@ -10,7 +10,7 @@ const CHARACTERS = [
     sprite: "assets/maues.png", spriteLegs: true, skin: "#e9a57e", legX: [9, 24], punchSprite: "assets/maues_punch.png", projectile: "chinelo",
     specials: { fireball: "CHINELADA", dp: "GANCHO DO MAUÉS", spin: "FURACÃO DE CHINELO", super: "SUPER CHINELADA" },
     quote: "Chinelo branco não perdoa ninguém!" },
-  { name: "João Pedro", color: "#4a5530", accent: "#3fa34d", stats: { speed: 4, power: 8, health: 9 }, sprite: null, parts: "assets/joao/", partsMeta: { ox: -13, legX: [1, 12] }, projectile: "granada",
+  { name: "João Pedro", color: "#4a5530", accent: "#3fa34d", stats: { speed: 4, power: 8, health: 9 }, sprite: null, parts: "assets/joao/", partsMeta: { ox: -21, legX: [8, 22] }, projectile: "granada",
     specials: { fireball: "GRANADA", dp: "GANCHO DE COMANDO", spin: "RAJADA DE COTURNO", super: "BOMBARDEIO TÁTICO" },
     quote: "Missão cumprida. Próximo da fila!" },
   { name: "Lutador 3", color: "#3bd16f", accent: "#1a1a1a", stats: { speed: 4, power: 9, health: 8 }, sprite: null,

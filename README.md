@@ -47,7 +47,7 @@ pode receber no máximo 2 golpes de "juggle" (gancho/super). Melhor de 3 rounds,
 Campos de cada lutador: `name`, `color`/`accent`, `stats` (1-10), `specials` (nomes), `quote` (frase de vitória), `projectile`
 (`chinelo`, `granada` ou padrão), `boss`, `scale`, e o visual:
 - `sprite` + `spriteLegs: true` + `punchSprite` (Maués): tronco com os pixels exatos da arte original (`assets/maues.png`), pernas e chinelos brancos desenhados pelo jogo, e `assets/maues_punch.png` com o braço esticado no mesmo estilo para os socos.
-- `parts: "assets/joao/"` (João Pedro): pixels da arte original divididos em partes — tronco em guarda/soco/gancho/defesa (braços de luta pintados no mesmo camuflado), pernas `leg_l`/`leg_r` que giram no quadril para chutes, e `win.png` (braços cruzados originais) para vitória.
+- `parts: "assets/joao/"` (João Pedro): pixels da arte original divididos em partes — tronco em guarda/soco/gancho/defesa (braços de luta pintados no mesmo camuflado), pernas `leg_l`/`leg_r` que giram no quadril para chutes, e `win.png` (arte original com braços para baixo) para vitória.
 - `sprite: "assets/arquivo.png"`: imagem própria (fundo transparente, virada para a direita). Com `spriteLegs: true` a imagem é só do tronco e o jogo desenha pernas.
 - nenhum dos dois: boneco procedural simples (como Lutador 3/4).
 
@@ -65,7 +65,17 @@ Campos de cada lutador: `name`, `color`/`accent`, `stats` (1-10), `specials` (no
 No menu, escolha **LUTA LIVRE (VS CPU)**. Primeiro escolha seu lutador, depois **ESCOLHA O ADVERSÁRIO** (cursor "CPU") — inclusive **ALEATÓRIO**, sorteado na hora da luta. Depois da luta você volta à seleção. O modo Arcade continua igual.
 
 ## João Pedro (sprite)
-Extraído na grade nativa da arte original (`assets/joao/`: guard, punch, upper, block, leg_l, leg_r, win). Pernas são peças separadas; a vitória usa a pose original de braços cruzados. Ajuste em `partsMeta` (`ox`, `legX`) no `js/characters.js`.
+Gerado com o kit no Gemini (`assets/joao_ref_gemini.png`), normalizado com `tools/normalizar.py` na mesma grade do Maués (`assets/joao_ref_normalizado.png`, 42x77) e dividido em peças por `tools/gerar_joao.py` (`assets/joao/`: guard, punch, upper, block, leg_l, leg_r, win). Cabeça, corpo e coturnos são os pixels originais; os braços de luta são os braços originais reposicionados. A vitória usa a arte original com braços para baixo. Ajuste em `partsMeta` (`ox`, `legX`) no `js/characters.js`.
 
 ## Cache / deploy
 Todos os scripts e imagens usam `?v=BUILD` (definido em `index.html`, `window.BUILD`). **Troque o valor de BUILD (e dos `?v=` nas tags script) a cada deploy**, senão navegadores podem misturar JS antigo do cache com JS novo.
+
+## Kit de padronização de personagens (`kit/`)
+Molde, exemplos e prompt para o Gemini: veja `kit/LEIA-ME.txt`. O kit fixa o estilo (grade, contorno, tons, proporção, pose, fundo branco), não a silhueta.
+- `tools/normalizar.py ENTRADA.png assets/NOME.png [--altura 88] [--cores 24] [--cabeca N]` faz o seguinte:
+  - tira o fundo e recorta;
+  - reduz a grade de pixel art;
+  - escala pela altura;
+  - limpa a paleta e refaz o contorno de 1 px.
+- No `js/characters.js`, use `sprite: "assets/NOME.png", fullSprite: true`. O personagem é desenhado inteiro, e as poses vêm de inclinação e deslocamento.
+- `tools/molde.py` regenera as imagens do kit.

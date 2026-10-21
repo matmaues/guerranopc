@@ -1,0 +1,84 @@
+======================================================================
+ PROMPT DE PERSONAGEM — GUERRA no P.C   (feito para o Google Gemini)
+======================================================================
+
+ANTES DE COLAR: anexe as imagens NESTA ORDEM no Gemini
+  1ª imagem: kit/molde_base.png          (molde de estilo, proporção e pose)
+  2ª imagem: assets/maues.png ou kit/molde_comparacao.png  (opcional: exemplo do estilo final)
+  3ª imagem: a FOTO da pessoa
+Troque [ROUPA], [ROSTO/CABELO] e [ACESSÓRIOS] pelo que você quer.
+(Se não anexar a 2ª imagem, troque "terceira imagem" por "segunda imagem".)
+
+----------------------------------------------------------------------
+ PORTUGUÊS (cole isto)
+----------------------------------------------------------------------
+Use a primeira imagem como molde de ESTILO, PROPORÇÃO e POSE. Use a segunda imagem como exemplo do acabamento de pixel art que eu quero. Transforme a pessoa da terceira imagem em um personagem de jogo de luta em pixel art 16-bit, no mesmo estilo.
+
+Regras de estilo (obrigatórias):
+- Pixel art 16-bit/8-bit de verdade: grade de mais ou menos 90x90 pixels, ampliada com pixels quadrados nítidos, sem desfoque, sem antialiasing, sem gradiente.
+- Contorno preto grosso de 1 pixel em volta de todo o personagem.
+- Sombreamento chapado: 2 a 3 tons por cor, no máximo.
+- Proporção chibi/robusta como no molde: cabeça grande (cerca de 1/4 da altura), corpo atarracado, pernas curtas.
+- Corpo inteiro da cabeça aos pés, nada cortado, pés apoiados na mesma linha.
+- Em pé, virado levemente para a direita (3/4), os dois braços soltos para baixo ao lado do corpo.
+- Um único personagem, centralizado, fundo BRANCO PURO liso (#FFFFFF), sem chão, sem sombra, sem cenário.
+- Sem texto, sem letreiro, sem logos pequenos, sem marca d'água.
+
+Mantenha os traços marcantes da pessoa da foto, mesmo que saiam do contorno do molde: barriga, cabelo alto ou volumoso, barba, óculos, boné ou chapéu, corrente, tatuagem e tipo de corpo. O molde define o estilo e a pose, NÃO a silhueta.
+
+Personagem:
+- Roupa: [ROUPA]
+- Rosto/cabelo: [ROSTO/CABELO]
+- Acessórios: [ACESSÓRIOS]
+
+----------------------------------------------------------------------
+ ENGLISH (paste this if Portuguese gives worse results)
+----------------------------------------------------------------------
+Use the first image as the template for STYLE, PROPORTIONS and POSE. Use the second image as an example of the pixel-art finish I want. Turn the person in the third image into a 16-bit pixel-art fighting-game character in that same style.
+
+Mandatory style rules:
+- True 16-bit/8-bit pixel art on a grid of about 90x90 pixels, upscaled with crisp square pixels: no blur, no anti-aliasing, no gradients.
+- Thick 1-pixel black outline around the whole character.
+- Flat shading with at most 2-3 tones per color.
+- Chunky chibi proportions like the template: big head (about 1/4 of the height), stocky body, short legs.
+- Full body from head to feet, nothing cropped, both feet on the same baseline.
+- Standing, turned slightly to the right (3/4 view), both arms relaxed and hanging down at the sides.
+- One single character, centered, on a plain PURE WHITE background (#FFFFFF), with no floor, no shadow and no scenery.
+- No text, no lettering, no small logos, no watermark.
+
+Keep the person's distinctive traits even if they go beyond the template outline: belly, tall or big hair, beard, glasses, cap or hat, chain, tattoos and body type. The template defines the style and pose, NOT the silhouette.
+
+Character:
+- Outfit: [ROUPA]
+- Face/hair: [ROSTO/CABELO]
+- Accessories: [ACESSÓRIOS]
+
+======================================================================
+ CORREÇÕES — cole no mesmo chat quando o Gemini sair do padrão
+======================================================================
+Geral (serve para quase tudo):
+  "Quase lá. Refaça a MESMA pessoa, mas siga exatamente o molde da primeira imagem: em pé, virado levemente para a direita, os dois braços para baixo ao lado do corpo, corpo inteiro, fundo branco puro, pixel art com contorno preto de 1 pixel e 2 a 3 tons por cor."
+
+Braços cruzados ou fazendo gesto:
+  "Descruze os braços. Os dois braços precisam ficar soltos, retos para baixo, ao lado do corpo, mãos abertas e relaxadas, igual ao molde. Não mude mais nada."
+
+Fundo errado (cenário, cinza, chão, sombra):
+  "Troque o fundo por branco puro liso (#FFFFFF). Tire chão, sombra, cenário e moldura. Só o personagem."
+
+Detalhado demais / parece desenho e não pixel art:
+  "Está detalhado demais. Simplifique para pixel art 16-bit de baixa resolução: cerca de 90x90 pixels, pixels grandes e quadrados, contorno preto de 1 pixel, no máximo 3 tons por cor, sem gradiente e sem antialiasing."
+
+Cortou os pés ou a cabeça:
+  "Mostre o corpo inteiro, da ponta do cabelo até os pés, com margem branca em volta. Nada cortado."
+
+Virado de frente ou para a esquerda:
+  "Vire o personagem levemente para a DIREITA (vista 3/4), como no molde."
+
+Perdeu a semelhança com a pessoa:
+  "Mantenha o estilo, mas deixe mais parecido com a pessoa da foto: [diga o que falta, ex.: barba mais cheia, óculos redondos, barriga maior]."
+
+Colocou texto ou logos:
+  "Remova todo texto, letreiro e logos pequenos da roupa. Use só cores chapadas."
+
+Proporção diferente (cabeça pequena, corpo alto):
+  "Deixe a cabeça maior (cerca de 1/4 da altura total) e o corpo mais baixo e atarracado, igual ao molde."

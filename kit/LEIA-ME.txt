@@ -1,0 +1,36 @@
+KIT DE PADRONIZAÇÃO DE PERSONAGENS — GUERRA no P.C
+==================================================
+Objetivo: todo personagem novo sai no MESMO ESTILO do Maués, mesmo vindo de fotos diferentes.
+O kit fixa o ESTILO, não a silhueta: barriga, cabelão, boné, barba e acessórios podem e devem aparecer.
+
+Arquivos
+- molde_base.png ............ manequim no tamanho real do jogo (45x90, ~88 px de altura), com grade e medidas
+- molde_1x.png .............. o mesmo manequim em 1x (anexo mais leve, se preferir)
+- molde_comparacao.png ...... manequim ao lado do Maués e do João Pedro
+- variacoes_permitidas.png .. exemplos de silhuetas diferentes no mesmo estilo
+- prompt_personagem.txt ..... prompt pronto para o Gemini (PT e EN) e prompts de correção
+
+Passo a passo (Google Gemini)
+1. Abra o Gemini e peça uma geração de imagem.
+2. Anexe, NESTA ORDEM: molde_base.png, depois assets/maues.png (opcional), depois a foto da pessoa.
+3. Copie o prompt em português de prompt_personagem.txt, preencha [ROUPA], [ROSTO/CABELO] e [ACESSÓRIOS] e envie.
+4. Se vier errado (braços cruzados, fundo com cenário, detalhado demais), cole a CORREÇÃO certa do
+   prompt_personagem.txt no mesmo chat. Normalmente 1 ou 2 correções bastam.
+5. Confira a imagem: corpo inteiro, virado para a direita, braços para baixo, fundo branco liso.
+6. Salve o PNG e normalize:
+     python3 tools/normalizar.py minha_imagem.png assets/fulano.png
+   (se tiver cabelo ou chapéu muito alto: --cabeca N, onde N = linha em que começa a testa/cabeça
+    na imagem recortada; assim a escala ignora o cabelo)
+7. Cadastre em js/characters.js, por exemplo copiando o bloco de um lutador e trocando:
+     name: "Fulano", sprite: "assets/fulano.png", fullSprite: true,
+   (apague qualquer "sprite: null" que estiver no mesmo bloco)
+8. Troque o número BUILD em index.html (window.BUILD e os ?v=) e publique.
+
+O que o normalizador faz sozinho
+- tira o fundo branco e recorta
+- detecta a grade da pixel art ampliada (mesmo fracionária, ex.: 11,38 px) e pega a cor dominante de cada
+  quadrado: 1 pixel de arte = 1 pixel, mesma densidade do Maués
+- escala pela ALTURA (pés até o topo da cabeça) para 88 px; a largura fica livre. Se a grade nativa já der
+  uma altura até 20% diferente (ex.: 77 px), mantém 1:1 para não deformar pixels (--tolerancia 0)
+  (cabelo ou chapéu pode passar até 25% disso)
+- limpa a paleta (até 24 cores, sem semitons) e refaz o contorno preto de 1 px

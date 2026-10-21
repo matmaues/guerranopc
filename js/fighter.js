@@ -195,6 +195,7 @@ class Fighter {
     if (pose === "spin" && Math.floor(this.anim / 4) % 2) f = -f;
     g.fillStyle = "#0006"; g.fillRect(x - 12 * s, (this.inFight ? GROUND : y) + 1, 24 * s, 3);
     if (this.cfg.parts) return this.drawParts(g, x, y, f, pose);
+    if (this.img && this.cfg.fullSprite) return this.drawFull(g, x, y, f, pose);
     if (this.img && this.cfg.spriteLegs) return this.drawLegged(g, x, y, f, pose);
     g.save(); g.translate(x, y); g.scale(f * s, s); this.drawProc(g, pose); g.restore();
   }
@@ -257,6 +258,24 @@ class Fighter {
     g.restore();
   }
   // Sprite de imagem (tronco em resolução total) + pernas e chinelos desenhados; poses movem/inclinam a imagem inteira
+  // sprite inteiro (saída do tools/normalizar.py): poses por inclinação/deslocamento
+  drawFull(g, x, y, f, pose) {
+    const im = this.img, iw = im.width, ih = im.height;
+    g.save(); g.translate(x, y); g.scale(f * 0.5, 0.5);
+    if (this.flash % 4 > 1) g.globalAlpha = 0.55;
+    if (pose === "down" || pose === "fall") { g.rotate(pose === "fall" ? -1.1 : -Math.PI / 2); g.drawImage(im, -ih / 2, -iw / 2 - 4); g.restore(); return; }
+    let rot = 0, dx = 0, dy = 0, sy = 1;
+    if (["punch", "cpunch", "jpunch"].includes(pose)) { dx = 6; rot = 0.08; }
+    else if (pose === "kick" || pose === "spin" || pose === "jkick") { rot = -0.2; }
+    else if (pose === "hit") { dx = -5; rot = -0.12; }
+    else if (pose === "upper" || pose === "cupper") { rot = -0.1; dy = -6; }
+    else if (pose === "walk") dy = -(Math.floor(this.anim / 7) % 2) * 2;
+    else if (pose === "idle") dy = Math.floor(this.anim / 15) % 2;
+    if (["crouch", "cpunch", "ckick", "cblock", "cupper"].includes(pose)) sy = 0.75;
+    g.translate(dx, dy); g.scale(1, sy); g.rotate(rot); g.drawImage(im, -Math.round(iw / 2), -ih);
+    if (pose === "block" || pose === "cblock") { g.globalAlpha = 0.6; g.fillStyle = "#7fd8ff"; g.fillRect(iw / 2 + 2, -ih + 14, 4, 40); }
+    g.restore();
+  }
   drawLegged(g, x, y, f, pose) {
     const im = this.img, sk = this.cfg.skin || "#e9a57e", OL = "#1a1010";
     const iw = im.width, ih = im.height, ox = -Math.round(iw / 2), LEN = 16, top = -(ih + LEN + 4), legX = this.cfg.legX || [9, 24];
