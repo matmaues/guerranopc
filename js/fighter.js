@@ -27,7 +27,7 @@ class Fighter {
     this.maxHp = 60 + cfg.stats.health * 8; this.hp = this.maxHp; this.spd = 0.7 + cfg.stats.speed * 0.13; this.pow = 0.6 + cfg.stats.power * 0.09;
     this.state = "idle"; this.t = 0; this.m = null; this.mf = 0; this.meter = 0; this.invuln = 0; this.flash = 0; this.anim = 0;
     this.buffer = null; this.input = {}; this.comboTaken = 0; this.comboShow = null; this.juggle = 0; this.popup = null; this.inFight = false;
-    this.img = null; if (cfg.sprite) { const c = Fighter.cache[cfg.sprite] || (Fighter.cache[cfg.sprite] = Object.assign(new Image(), { src: cfg.sprite })); if (c.complete && c.naturalWidth) this.img = c; else c.addEventListener("load", () => this.img = c); }
+    this.img = null; if (cfg.sprite) { const c = Fighter.cache[cfg.sprite] || (Fighter.cache[cfg.sprite] = Object.assign(new Image(), { src: cfg.sprite + "?v=" + (window.BUILD || 1) })); if (c.complete && c.naturalWidth) this.img = c; else c.addEventListener("load", () => this.img = c); }
   }
   get grounded() { return this.y >= GROUND; }
   get crouching() { return this.state === "crouch" || (this.m && this.m.crouch) || (FREE.includes(this.state) && this.input.down) || (this.state === "blockstun" && this.input.down); }
@@ -228,7 +228,7 @@ class Fighter {
     }
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = ac + "66"; g.fillRect(-14, -60, 6, 50); }
   }
-  static load(src) { const c = Fighter.cache[src] || (Fighter.cache[src] = Object.assign(new Image(), { src })); return c.complete && c.naturalWidth ? c : null; }
+  static load(src) { const c = Fighter.cache[src] || (Fighter.cache[src] = Object.assign(new Image(), { src: src + "?v=" + (window.BUILD || 1) })); return c.complete && c.naturalWidth ? c : null; }
   // Lutador por partes (pixels da arte original): tronco por pose + pernas que giram no quadril
   drawParts(g, x, y, f, pose) {
     const b = this.cfg.parts, I = n => Fighter.load(b + n + ".png");

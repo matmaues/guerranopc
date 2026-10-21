@@ -60,3 +60,12 @@ Campos de cada lutador: `name`, `color`/`accent`, `stats` (1-10), `specials` (no
 - `js/ai.js` – CPU (anti-aéreo, defesa alta/baixa, combos, especiais, super; fica mais forte a cada luta do Arcade)
 - `js/audio.js` – sons chiptune, "voz" sintética do locutor (ROUND, FIGHT, K.O., PERFECT) e música — tudo gerado por WebAudio
 - `js/game.js` – telas (título, seleção, cenário, VS, luta, pausa, frase de vitória, continue, final), HUD e loop
+
+## Luta Livre (vs CPU)
+No menu, escolha **LUTA LIVRE (VS CPU)**. Primeiro escolha seu lutador, depois **ESCOLHA O ADVERSÁRIO** (cursor "CPU") — inclusive **ALEATÓRIO**, sorteado na hora da luta. Depois da luta você volta à seleção. O modo Arcade continua igual.
+
+## João Pedro (sprite)
+Extraído na grade nativa da arte original (`assets/joao/`: guard, punch, upper, block, leg_l, leg_r, win). Pernas são peças separadas; a vitória usa a pose original de braços cruzados. Ajuste em `partsMeta` (`ox`, `legX`) no `js/characters.js`.
+
+## Cache / deploy
+Todos os scripts e imagens usam `?v=BUILD` (definido em `index.html`, `window.BUILD`). **Troque o valor de BUILD (e dos `?v=` nas tags script) a cada deploy**, senão navegadores podem misturar JS antigo do cache com JS novo.
