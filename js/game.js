@@ -49,7 +49,7 @@ function drawStage(t) {
 // ---------- retratos ----------
 const PORTRAITS = CHARACTERS.map(c => new Fighter(c, 0, 1, null));
 const skinsOf = i => (CHARACTERS[i] && CHARACTERS[i].skins) || [{ nome: "Original" }];
-function fixMirror() { if (!game.skin) game.skin = [0, 0]; if (game.sel[0] === game.sel[1] && game.skin[0] === game.skin[1]) game.skin[1] = (game.skin[1] + 1) % skinsOf(game.sel[1]).length; }
+function fixMirror() { if (!game.skin) game.skin = [0, 0]; if (game.sel[0] === game.sel[1] && game.skin[0] === game.skin[1] && skinsOf(game.sel[1]).length > 1) game.skin[1] = (game.skin[1] + 1) % skinsOf(game.sel[1]).length; }
 function skinFor(pi) { const l = skinsOf(game.sel[pi]); return l[((game.skin || [0, 0])[pi] || 0) % l.length]; }
 function portrait(i, x, y, sc = 1, pose = "idle", flip = 1, dark, skin) {
   const f = PORTRAITS[i]; f.skin = skin || null; f.x = 0; f.y = 0; f.facing = flip; f.state = "idle"; f.anim = game.frame; f.flash = 0; f.input = {}; f.inFight = false; const op = f.pose; f.pose = () => pose;

@@ -49,7 +49,7 @@ Planilha de personagens (kit/personagens.xlsx)
 3. Salve no mesmo lugar e rode:  python3 tools/planilha.py importar
 4. Para recriar a planilha com os valores atuais do jogo:  python3 tools/planilha.py exportar
 
-Skins
-- Na seleção, ▲/▼ troca a skin (no Versus: W/S para o P1, setas ▲/▼ para o P2).
-- Se os dois lados escolherem o mesmo personagem com a mesma skin, o P2 recebe outra automaticamente.
-- Para criar skins, veja js/characters.js (lista "skins") e assets/skins/LEIA-ME.txt (skins com imagens próprias).
+Skins (roupas)
+- Por enquanto todos usam só a Original. Para uma roupa nova: crie a pasta assets/skins/<nome>/ com as imagens
+  (instruções em assets/skins/LEIA-ME.txt) e adicione { nome, pasta } na lista "skins" do personagem.
+- Com 2 ou mais skins: ▲/▼ troca na seleção, e no espelho o P2 recebe outra skin automaticamente.

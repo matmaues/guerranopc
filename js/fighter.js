@@ -206,7 +206,7 @@ class Fighter {
     g.save(); g.translate(x, y); g.scale(f * s, s); this.drawProc(g, pose); g.restore();
   }
   drawProc(g, pose) {
-    const c = (this.skin && this.skin.color) || this.cfg.color, ac = (this.skin && this.skin.accent) || this.cfg.accent, sk = "#f2c49b", dk = "#222", W = this.flash % 4 > 1;
+    const c = this.cfg.color, ac = this.cfg.accent, sk = "#f2c49b", dk = "#222", W = this.flash % 4 > 1;
     const R = (x, y, w, h, col) => { g.fillStyle = W ? "#fff" : col; g.fillRect(x, y, w, h); };
     const head = (hy, hx = 0) => { R(-5 + hx, hy, 11, 11, sk); R(-6 + hx, hy - 1, 13, 4, ac); R(3 + hx, hy + 4, 2, 2, "#000"); };
     if (pose === "down" || pose === "fall") { if (pose === "fall") g.rotate(-0.5); R(-24, -7, 20, 6, c); R(-4, -10, 16, 10, c); R(-4, -10, 3, 10, ac); R(12, -11, 10, 10, sk); R(20, -12, 3, 11, ac); return; }
@@ -236,27 +236,12 @@ class Fighter {
     if (pose === "upper" && this.anim % 4 < 2) { g.fillStyle = ac + "66"; g.fillRect(-14, -60, 6, 50); }
   }
   // ---- SKINS ----
-  // skin = { nome, pasta } -> usa imagens com o mesmo nome de arquivo dentro da pasta
-  //        { nome, troca: [{ faixa: [h1, h2], matiz, sat, luz }] } -> troca de paleta (matiz em graus)
-  //        { nome, color, accent } -> cores dos personagens desenhados por código
+  // skin = { nome, pasta } -> usa imagens de mesmo nome dentro da pasta (roupa nova); arquivo que faltar usa o original
   tex(path) {
     const sk = this.skin; if (!path) return null;
     if (sk && sk.pasta) { const alt = Fighter.load(sk.pasta + path.split("/").pop()); if (alt) return alt; }
-    const im = Fighter.load(path); if (!im || !sk || !sk.troca) return im;
-    const key = path + "|" + this.cfg.name + "|" + sk.nome; if (Fighter.skinCache[key]) return Fighter.skinCache[key];
-    const c = document.createElement("canvas"); c.width = im.width; c.height = im.height; const x = c.getContext("2d"); x.drawImage(im, 0, 0);
-    const d = x.getImageData(0, 0, c.width, c.height), a = d.data;
-    for (let i = 0; i < a.length; i += 4) { if (!a[i + 3]) continue;
-      const r = a[i] / 255, gg = a[i + 1] / 255, b = a[i + 2] / 255, mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), l = (mx + mn) / 2, dd = mx - mn;
-      if (dd < 0.06) continue; const s = dd / (1 - Math.abs(2 * l - 1));
-      let h = mx === r ? ((gg - b) / dd) % 6 : mx === gg ? (b - r) / dd + 2 : (r - gg) / dd + 4; h = (h * 60 + 360) % 360;
-      const t = sk.troca.find(t => t.faixa[0] <= t.faixa[1] ? h >= t.faixa[0] && h <= t.faixa[1] : h >= t.faixa[0] || h <= t.faixa[1]); if (!t || s < (t.minSat ?? 0.12)) continue;
-      const H = t.matiz ?? h, S = Math.min(1, s * (t.sat ?? 1)), L = Math.min(1, l * (t.luz ?? 1)), C = (1 - Math.abs(2 * L - 1)) * S, X = C * (1 - Math.abs((H / 60) % 2 - 1)), m = L - C / 2;
-      const [r1, g1, b1] = H < 60 ? [C, X, 0] : H < 120 ? [X, C, 0] : H < 180 ? [0, C, X] : H < 240 ? [0, X, C] : H < 300 ? [X, 0, C] : [C, 0, X];
-      a[i] = (r1 + m) * 255; a[i + 1] = (g1 + m) * 255; a[i + 2] = (b1 + m) * 255; }
-    x.putImageData(d, 0, 0); return (Fighter.skinCache[key] = c);
+    return Fighter.load(path);
   }
-  static skinCache = {};
   static load(src) { const c = Fighter.cache[src] || (Fighter.cache[src] = Object.assign(new Image(), { src: src + "?v=" + (window.BUILD || 1) })); return c.complete && c.naturalWidth ? c : null; }
   // Lutador por partes (pixels da arte original): tronco por pose + pernas que giram no quadril
   drawParts(g, x, y, f, pose) {

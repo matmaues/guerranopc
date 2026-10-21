@@ -104,9 +104,8 @@ Simulação CPU x CPU (nível 4, 200 lutas, lados alternados): Maués 47,5% x Jo
 - Os ajustes de especiais por personagem ficam em `moves` (fireball/super: `dmg`, `vel`, `hits`; dp/spin: `dmg`, `s`, `a`, `r`, `maxHits`).
 
 ## Skins
-Cada personagem tem uma lista `skins`. Na seleção, ▲/▼ troca a skin; no Versus é W/S para o P1 e ▲/▼ para o P2. Num espelho, o P2 recebe outra skin automaticamente.
+Hoje todo personagem tem só a skin `Original`. Para adicionar roupas novas:
+1. Crie uma pasta `assets/skins/<nome>/` com imagens de mesmo nome e tamanho dos originais (veja `assets/skins/LEIA-ME.txt`).
+2. Adicione `{ nome: "...", pasta: "assets/skins/<nome>/" }` na lista `skins` do personagem.
 
-Há três tipos de skin:
-- `troca`: troca de paleta por faixa de matiz.
-- `pasta`: imagens próprias com os mesmos nomes de arquivo, em `assets/skins/<nome>/`. O exemplo é `maues_branca`.
-- `color`/`accent`: para personagens desenhados por código.
+Com mais de uma skin, ▲/▼ troca a skin na seleção (no Versus: W/S para o P1 e ▲/▼ para o P2), e num espelho o P2 recebe outra skin automaticamente. Com uma skin só, a dica não aparece e os dois lados usam a Original, sem tingimento.
