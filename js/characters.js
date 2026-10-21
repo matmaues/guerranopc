@@ -1,16 +1,24 @@
 // ===== CONFIGURAÇÃO DOS PERSONAGENS =====
-// Edite livremente: name, cor, stats (1-10) e sprite (caminho da imagem, ou null para desenho procedural).
-// special.type: "projetil" | "investida" | "uppercut" | "terremoto"
+// name: nome | color/accent: cores | stats (1-10): speed (velocidade), power (força), health (vida)
+// puppet: boneco pixel-art desenhado em js/puppet.js ("maues" ou "joao").
+// sprite: caminho da imagem (null = desenho procedural). spriteLegs: true se a imagem é só do tronco (o jogo desenha as pernas).
+// specials: nomes dos golpes especiais (os comandos são iguais para todos).
+// quote: frase de vitória. boss: true = Chefão (último da escada do Arcade; selecionável só no Versus). scale: tamanho do desenho.
 const CHARACTERS = [
   { name: "Maués", color: "#1f4fc4", accent: "#ffd23f", stats: { speed: 6, power: 7, health: 6 },
-    // spriteLegs: true = a imagem é só do tronco pra cima (até o short); o jogo desenha pernas/tênis animados.
-    // Use false (ou omita) para imagens de corpo inteiro.
-    sprite: "assets/maues.png", spriteLegs: true, skin: "#e9a57e", legX: [9, 24], // legX = posição x (px da imagem) onde começam as pernas
-    special: { name: "Bola de Fogo do Maués", type: "projetil" } },
-  { name: "Lutador 2", color: "#3b7be8", accent: "#ffffff", stats: { speed: 9, power: 4, health: 5 },
-    sprite: null, special: { name: "Investida Relâmpago", type: "investida" } },
-  { name: "Lutador 3", color: "#3bd16f", accent: "#1a1a1a", stats: { speed: 4, power: 9, health: 8 },
-    sprite: null, special: { name: "Terremoto", type: "terremoto" } },
-  { name: "Lutador 4", color: "#b03be8", accent: "#ff9ff3", stats: { speed: 7, power: 7, health: 4 },
-    sprite: null, special: { name: "Gancho Voador", type: "uppercut" } },
+    puppet: "maues", sprite: null, projectile: "chinelo",
+    specials: { fireball: "CHINELADA", dp: "GANCHO DO MAUÉS", spin: "FURACÃO DE CHINELO", super: "SUPER CHINELADA" },
+    quote: "Chinelo branco não perdoa ninguém!" },
+  { name: "João Pedro", color: "#4a5530", accent: "#3fa34d", stats: { speed: 4, power: 8, health: 9 }, puppet: "joao", sprite: null, projectile: "granada",
+    specials: { fireball: "GRANADA", dp: "GANCHO DE COMANDO", spin: "RAJADA DE COTURNO", super: "BOMBARDEIO TÁTICO" },
+    quote: "Missão cumprida. Próximo da fila!" },
+  { name: "Lutador 3", color: "#3bd16f", accent: "#1a1a1a", stats: { speed: 4, power: 9, health: 8 }, sprite: null,
+    specials: { fireball: "PEDRADA", dp: "GANCHO DE PEDRA", spin: "ROLO COMPRESSOR", super: "TERREMOTO TOTAL" },
+    quote: "Força bruta resolve tudo." },
+  { name: "Lutador 4", color: "#b03be8", accent: "#ff9ff3", stats: { speed: 7, power: 7, health: 4 }, sprite: null,
+    specials: { fireball: "RAIO ROXO", dp: "GANCHO VOADOR", spin: "PIÃO ROXO", super: "FÚRIA VIOLETA" },
+    quote: "Volte quando treinar mais." },
+  { name: "Chefão", color: "#2b2b33", accent: "#e83b3b", stats: { speed: 7, power: 9, health: 10 }, sprite: null, boss: true, scale: 1.2,
+    specials: { fireball: "BOLA SOMBRIA", dp: "GANCHO DO CHEFÃO", spin: "FURACÃO SOMBRIO", super: "APOCALIPSE" },
+    quote: "Ninguém derruba o Chefão!" },
 ];

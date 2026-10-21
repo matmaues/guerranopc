@@ -1,56 +1,62 @@
 # GUERRA no P.C
 
-Jogo de luta 8-bit para navegador (HTML/CSS/JS puro, sem build). Abra `index.html` por um servidor local:
-`python3 -m http.server 8000` e acesse http://localhost:8000
+Jogo de luta 8-bit estilo fliperama (inspirado nos clássicos de luta dos anos 90, com código, arte e sons 100% originais).
+HTML/CSS/JS puro, sem build. Rode um servidor local na pasta: `python3 -m http.server 8000` e abra http://localhost:8000
 
-## Controles
-| Ação | Tecla |
-|---|---|
-| Mover | Setas ou A/D |
-| Pular | Seta ↑ ou W |
-| Agachar | Seta ↓ ou S |
-| Soco | J |
-| Chute | K |
-| Especial | L (tem recarga, barrinha abaixo da vida) |
-| Defender | Segure para TRÁS (longe do oponente) |
-| Mudo | M |
-| Menu | Enter confirma, Esc volta |
+## Modos
+- **ARCADE**: escolha um lutador e vença todos os outros em sequência; no fim, o **CHEFÃO**. Perdeu? Tela de **CONTINUAR?** com contagem (aperte Enter).
+- **VERSUS**: 2 jogadores no mesmo teclado. Cada um escolhe o lutador (P1 confirma com Enter/U, P2 com Num4/Num Enter/vírgula).
+- Título: Enter põe a ficha (INSERT COIN), Enter de novo = START. Menu: modo, dificuldade (◀ ▶) e lista de comandos.
 
-No celular aparecem botões de toque. Na seleção, ▲/▼ muda a dificuldade (a CPU também fica mais forte a cada round que você vence).
-Melhor de 3 rounds, 60 segundos cada.
+## Comandos
+Direções relativas ao lado em que você está virado (→ = para frente).
 
-## Como trocar personagens (nomes, stats e imagens)
-Tudo fica em **`js/characters.js`**. Cada lutador tem:
-```js
-{ name: "Lutador 1", color: "#e83b3b", accent: "#ffd23f",
-  stats: { speed: 6, power: 6, health: 6 },      // valores de 1 a 10
-  sprite: null,                                    // ex.: "assets/meu_lutador.png"
-  special: { name: "Bola de Fogo", type: "projetil" } }
-```
-- **name**: nome que aparece no jogo.
-- **color / accent**: cores do desenho procedural e dos efeitos.
-- **stats**: velocidade, força (dano) e vida.
-- **sprite**: coloque sua imagem PNG (de preferência fundo transparente, virada para a DIREITA, ~48x48 px) na pasta `assets/` e escreva o caminho aqui. Com `null`, o boneco é desenhado por código.
-- **special.type**: `projetil`, `investida`, `uppercut` ou `terremoto`.
+| Ação | P1 | P2 (Versus) |
+|---|---|---|
+| Andar / pular / agachar | A D / W / S (no Arcade também setas) | setas |
+| Soco fraco / forte | U / I | Num4 / Num5 (ou , .) |
+| Chute fraco / forte | J / K | Num1 / Num2 (ou ; /) |
+| Especial simples | L (neutro = projétil, ↓+L = gancho, trás+L = furacão) | Num6 (ou ') |
+| Super simples (barra cheia) | O | Num3 (ou ]) |
+| Pausa (com lista de comandos) | Enter ou P | |
+| Sair para o título (na pausa) | Esc | |
+| Som liga/desliga | M | |
 
-Para adicionar um 5º lutador, basta copiar um bloco e adicionar à lista.
+**Golpes de comando (iguais para todos):**
+- **Projétil**: ↓ ↘ → + soco (forte = mais rápido)
+- **Gancho anti-aéreo**: → ↓ ↘ + soco (invencível no começo, derruba)
+- **Furacão**: ↓ ↙ ← + chute (avança girando, até 3 hits)
+- **SUPER**: ↓ ↘ → ↓ ↘ → + soco com a barra SUPER cheia (congela a tela, 5 hits)
+- **Agarrão**: perto do oponente, → ou ← + soco forte
+- **Defesa**: segure TRÁS. Em pé defende golpes aéreos; agachado (↙) defende rasteiras. Especiais tiram um pouco de vida mesmo defendidos (chip).
+- Agachado + chute forte = **rasteira** (derruba).
+
+**Combos:** golpes fracos encadeiam (U, U, U...), e qualquer golpe normal que acertar pode ser cancelado em especial ou super
+(ex.: J → ↓↘→ + U). O contador "N HITS!" aparece na tela. Dano diminui um pouco a cada hit do combo; um oponente caindo
+pode receber no máximo 2 golpes de "juggle" (gancho/super). Melhor de 3 rounds, 99 segundos.
+
+## Personagens (`js/characters.js`)
+| Lutador | Vel/For/Vida | Especiais |
+|---|---|---|
+| Maués | 6/7/6 | Chinelada, Gancho do Maués, Furacão de Chinelo, SUPER CHINELADA |
+| João Pedro | 4/8/9 | Granada, Gancho de Comando, Rajada de Coturno, BOMBARDEIO TÁTICO |
+| Lutador 3 | 4/9/8 | Pedrada, Gancho de Pedra, Rolo Compressor, Terremoto Total |
+| Lutador 4 | 7/7/4 | Raio Roxo, Gancho Voador, Pião Roxo, Fúria Violeta |
+| Chefão | 7/9/10 | chefe final do Arcade (no Versus pode ser escolhido) |
+
+Campos de cada lutador: `name`, `color`/`accent`, `stats` (1-10), `specials` (nomes), `quote` (frase de vitória), `projectile`
+(`chinelo`, `granada` ou padrão), `boss`, `scale`, e o visual:
+- `puppet: "maues"` / `"joao"`: bonecos pixel-art desenhados pixel a pixel em `js/puppet.js` (todas as poses: guarda, andar, soco, chute, agachar, pulo, gancho, apanhar, K.O., vitória). Cores e detalhes (óculos, bigode, camisa azul com detalhes brancos, short branco, relógio, chinelos; boina com estrela verde, camuflado, emblema, coturnos) ficam em `STYLES` nesse arquivo.
+- `sprite: "assets/arquivo.png"`: imagem própria (fundo transparente, virada para a direita). Com `spriteLegs: true` a imagem é só do tronco e o jogo desenha pernas.
+- nenhum dos dois: boneco procedural simples (como Lutador 3/4).
+
+## Cenários (`js/stages.js`)
+`name`, `image` (640x360), `thumb`, `groundY` (linha do chão 0-180; CSM Nova Suíça = 157, em cima do piso da praça). `locked: true` = "???".
 
 ## Estrutura
-- `js/characters.js` – configuração dos lutadores
-- `js/fighter.js` – física, golpes, desenho
-- `js/ai.js` – controladores (humano e CPU)
-- `js/input.js` – teclado/toque e mapa `CONTROLS` (já tem espaço para `p2`)
-- `js/audio.js` – sons chiptune WebAudio e música
-- `js/game.js` – telas, HUD, cenário, loop
-
-**2 jogadores (futuro):** descomente `CONTROLS.p2` em `input.js` e, em `game.js` (`startRound`), troque `new CPUController(lvl)` por `new HumanController(CONTROLS.p2)`.
-
-## Sprite só do tronco (`spriteLegs: true`)
-O canvas tem 640x360 pixels reais; a lógica do jogo usa 320x180 (cada "pixel" dos bonecos procedurais = 2x2).
-Imagens de lutador com `spriteLegs: true` são desenhadas em resolução total (1 pixel da imagem = 1 pixel real), então
-ficam com o dobro de detalhe. O Maués usa `assets/maues.png` (43x66 px, grade original da arte, do cabelo até o short).
-O jogo completa as pernas (cor `skin`, contorno preto) com chinelos brancos, e anima as poses movendo/inclinando a imagem
-inteira, sem redesenhar o rosto, braços ou roupa. `legX` = colunas da imagem onde começam as duas pernas.
-
-## Cenários
-Ficam em **`js/stages.js`**: `name`, `image` (640x360), `thumb` (miniatura) e `groundY` (linha do chão, 0–180; o CSM Nova Suíça usa 157 = em cima do piso da praça). Entradas com `locked: true` aparecem como "???" na tela de escolha de cenário.
+- `js/input.js` – teclado/toque, mapas `CONTROLS` (P1, P2) e leitura de comandos com buffer (meias-luas, gancho)
+- `js/fighter.js` – golpes (tabela `MOVES`), hit/block stun, combos, agarrão, knockdown, desenho
+- `js/puppet.js` – bonecos pixel-art (Maués, João Pedro)
+- `js/ai.js` – CPU (anti-aéreo, defesa alta/baixa, combos, especiais, super; fica mais forte a cada luta do Arcade)
+- `js/audio.js` – sons chiptune, "voz" sintética do locutor (ROUND, FIGHT, K.O., PERFECT) e música — tudo gerado por WebAudio
+- `js/game.js` – telas (título, seleção, cenário, VS, luta, pausa, frase de vitória, continue, final), HUD e loop

@@ -6,12 +6,12 @@ html,body{margin:0;background:#000;height:100%;overflow:hidden;touch-action:none
 canvas{image-rendering:pixelated;image-rendering:crisp-edges;background:#000}
 #touch{position:fixed;bottom:8px;left:0;right:0;display:none;justify-content:space-between;padding:0 10px;pointer-events:none}
 #touch div{pointer-events:auto}
-.tb{display:inline-block;width:48px;height:48px;margin:3px;border:3px solid #fff;color:#fff;font:bold 16px monospace;line-height:48px;text-align:center;background:#0008;user-select:none;-webkit-user-select:none}
+.tb{display:inline-block;width:40px;height:40px;margin:2px;border:3px solid #fff;color:#fff;font:bold 12px monospace;line-height:40px;text-align:center;background:#0008;user-select:none;-webkit-user-select:none}
 @media (pointer:coarse){#touch{display:flex}}
 </style></head><body>
 <div id="wrap"><canvas id="c" width="640" height="360"></canvas></div>
 <div id="touch"><div><span class="tb" data-k="ArrowLeft">◀</span><span class="tb" data-k="ArrowUp">▲</span><span class="tb" data-k="ArrowDown">▼</span><span class="tb" data-k="ArrowRight">▶</span></div>
-<div><span class="tb" data-k="KeyJ">J</span><span class="tb" data-k="KeyK">K</span><span class="tb" data-k="KeyL">L</span><span class="tb" data-k="Enter">OK</span></div></div>
+<div><span class="tb" data-k="KeyU">SF</span><span class="tb" data-k="KeyI">SF+</span><span class="tb" data-k="KeyJ">CF</span><span class="tb" data-k="KeyK">CF+</span><span class="tb" data-k="KeyL">ESP</span><span class="tb" data-k="KeyO">SUP</span><span class="tb" data-k="Enter">OK</span></div></div>
 <script src="js/characters.js"></script><script src="js/stages.js"></script><script src="js/audio.js"></script><script src="js/input.js"></script>
-<script src="js/fighter.js"></script><script src="js/ai.js"></script><script src="js/game.js"></script>
+<script src="js/puppet.js"></script><script src="js/fighter.js"></script><script src="js/ai.js"></script><script src="js/game.js"></script>
 </body></html>

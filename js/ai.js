@@ -1,26 +1,50 @@
-// Controladores: qualquer objeto com get(self, opp, game) -> {held, pressed}
-class HumanController { constructor(map) { this.map = map; } get() { return Input.player(this.map); } }
+// CPU: devolve o mesmo formato do HumanController ({fwd, back, up, down, cmd}). level 1..8
 class CPUController {
-  constructor(level = 1) { this.level = level; this.plan = null; this.timer = 0; }
+  constructor(level = 2) { this.L = Math.max(1, Math.min(8, level)); this.plan = "walk"; this.timer = 0; this.hold = {}; this.react = 0; }
   get(me, op, game) {
-    const L = Math.min(this.level, 5), held = {}, pressed = {}, dist = Math.abs(op.x - me.x), fw = me.facing === 1 ? "right" : "left", bk = me.facing === 1 ? "left" : "right";
-    const react = 0.25 + L * 0.12;
-    // defender ataques do oponente
-    if (op.atk && dist < 50 && Math.random() < react) { held[bk] = true; if (op.atk.name === "kick" && Math.random() < 0.4) held.down = true; return { held, pressed }; }
-    if (game.projectiles.some(p => p.owner !== me && Math.abs(p.x - me.x) < 60) && Math.random() < react) { if (Math.random() < 0.5) held.up = true; else held[bk] = true; return { held, pressed }; }
+    const L = this.L, R = Math.random, dist = Math.abs(op.x - me.x), out = { fwd: false, back: false, up: false, down: false, cmd: null };
+    const k = 0.15 + L * 0.09; // reflexo/qualidade
+    if (!game.fighting) return out;
+    // continuar combo: normal acertou -> cancela em especial
+    if (me.state === "attack" && me.m && me.mhit && !me.m.special && !me.m.air && R() < k * 0.6) {
+      out.cmd = me.meter >= 100 && R() < 0.5 ? { n: "super" } : R() < 0.6 ? { n: "fireball", s: "h" } : R() < 0.5 ? { n: "spin", s: "h" } : { n: "dp", s: "h" };
+      if (me.m.chain && R() < 0.4) out.cmd = { n: R() < 0.5 ? "lp" : "lk" };
+      return out;
+    }
+    if (me.state !== "idle" && me.state !== "walk" && me.state !== "crouch" && me.state !== "blockstun" && me.state !== "jump") return out;
+    // ataque aéreo ao cair perto
+    if (me.state === "jump") { if (me.vy > 0 && dist < 40 && R() < k) out.cmd = { n: R() < 0.5 ? "hk" : "hp" }; return out; }
+    // anti-aéreo
+    if (!op.grounded && op.state === "jump" && dist < 70 && op.vy > -2 && Math.abs(op.vx) > 0.2 && R() < k * 0.5) { out.cmd = { n: R() < 0.7 ? "dp" : "hp", s: "h" }; if (out.cmd.n === "hp") out.down = true; return out; }
+    // defesa
+    const threat = (op.state === "attack" && dist < 70) || game.projectiles.some(p => p.owner !== me && Math.abs(p.x - me.x) < 90 && Math.sign(p.vx) === Math.sign(me.x - p.x));
+    if (threat && R() < Math.min(0.92, k * 1.3)) {
+      const proj = game.projectiles.find(p => p.owner !== me);
+      if (proj && !op.m && R() < 0.06 * L && Math.abs(proj.x - me.x) > 50) { out.up = true; out.fwd = true; return out; }
+      out.back = true; out.down = op.m ? op.m.lvl === "low" || (op.m.lvl === "mid" && op.crouching) : false; if (op.m && op.m.lvl === "high") out.down = false; return out;
+    }
+    if (me.state === "blockstun") { out.back = true; out.down = me.input.down; return out; }
     if (--this.timer <= 0) {
-      const r = Math.random();
-      this.plan = dist > 40 ? (r < 0.65 ? "approach" : r < 0.8 ? "special" : r < 0.9 ? "jump" : "wait") : (r < 0.35 + L * 0.06 ? "attack" : r < 0.6 ? "block" : r < 0.75 ? "retreat" : r < 0.88 ? "jump" : "special");
-      this.timer = 10 + Math.random() * (40 - L * 5);
+      const r = R();
+      if (me.meter >= 100 && dist < 140 && r < 0.12 + L * 0.03) this.plan = "super";
+      else if (dist > 110) this.plan = r < 0.35 + L * 0.03 ? "fireball" : r < 0.8 ? "walk" : "jumpin";
+      else if (dist > 36) this.plan = r < 0.45 ? "walk" : r < 0.6 ? "fireball" : r < 0.75 ? "jumpin" : r < 0.88 ? "backoff" : "wait";
+      else this.plan = r < 0.35 + L * 0.05 ? "combo" : r < 0.5 ? "throw" : r < 0.65 ? "sweep" : r < 0.82 ? "block" : "backoff";
+      this.timer = 8 + R() * (40 - L * 3);
     }
     switch (this.plan) {
-      case "approach": held[fw] = true; break;
-      case "retreat": held[bk] = true; break;
-      case "block": held[bk] = true; if (Math.random() < 0.3) held.down = true; break;
-      case "jump": held.up = true; held[fw] = Math.random() < 0.7; this.plan = "attack"; break;
-      case "special": pressed.special = true; this.plan = "wait"; break;
-      case "attack": if (dist < 34 && Math.random() < 0.15 + L * 0.06) pressed[Math.random() < 0.55 ? "punch" : "kick"] = true; else if (dist >= 34) held[fw] = true; break;
+      case "walk": out.fwd = true; if (dist < 34) this.plan = "combo"; break;
+      case "backoff": out.back = true; break;
+      case "block": out.back = true; out.down = R() < 0.5; break;
+      case "jumpin": out.up = true; out.fwd = true; this.plan = "wait"; break;
+      case "fireball": out.cmd = { n: "fireball", s: R() < 0.5 ? "h" : "l" }; this.plan = "wait"; break;
+      case "super": out.cmd = { n: "super" }; this.plan = "wait"; break;
+      case "throw": if (dist < 26) { out.cmd = { n: "throw" }; this.plan = "wait"; } else out.fwd = true; break;
+      case "sweep": if (dist < 36) { out.down = true; out.cmd = { n: "hk" }; this.plan = "wait"; } else out.fwd = true; break;
+      case "combo":
+        if (dist < 32) { const r = R(); out.cmd = { n: r < 0.35 ? "lk" : r < 0.6 ? "lp" : r < 0.8 ? "hp" : "hk" }; out.down = R() < 0.4; this.plan = R() < 0.5 ? "combo" : "wait"; this.timer = Math.min(this.timer, 10); }
+        else out.fwd = true; break;
     }
-    return { held, pressed };
+    return out;
   }
 }
