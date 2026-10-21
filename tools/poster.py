@@ -50,9 +50,9 @@ for i,(n,spr,proj,pk,arq) in enumerate(chars):
     P.paste(pr,(1110-pr.width//2,y+125-pr.height//2),pr); T(1110,y+192,sp['fireball'],24,(255,210,63),'ma',False)
 yb=y0+3*RH+10
 T(W//2,yb,'CENÁRIOS',44,(255,210,63),'ma')
-from_json=[('CSM Nova Suíça','assets/stage_csm_nova_suica.png'),('Clube Chalézinho','assets/stage_clube_chalezinho.png')]
+from_json=[('CSM Nova Suíça','assets/stage_csm_nova_suica.png'),('Clube Chalézinho','assets/stage_clube_chalezinho.png'),('Monte Pascoal','assets/stage_monte_pascoal.png')]
 for i,(n,pth) in enumerate(from_json):
-    im=Image.open(pth).convert('RGB').resize((480,270),Image.NEAREST); x=80+i*600; d.rectangle([x-6,yb+64,x+486,yb+340],fill=(255,210,63)); P.paste(im,(x,yb+70))
-    T(x+240,yb+350,n,30,(255,255,255),'ma')
+    im=Image.open(pth).convert('RGB').resize((384,216),Image.NEAREST); x=34+i*412; d.rectangle([x-6,yb+64,x+390,yb+286],fill=(255,210,63)); P.paste(im,(x,yb+70))
+    T(x+192,yb+298,n,28,(255,255,255),'ma')
 T(W//2,H-50,'genéricos: Lutador 3 • Lutador 4 • Chefão (último do Arcade)',22,(150,150,180),'ma',False)
 P.save('screens/resumo_jogo.png'); print(P.size)

@@ -118,3 +118,8 @@ Com mais de uma skin, ▲/▼ troca a skin na seleção (no Versus: W/S para o P
 - Cenário novo: `Clube Chalézinho` (`assets/stage_clube_chalezinho.png`, chão em groundY 163). No Arcade, os cenários se alternam a cada luta.
 - Frases de vitória: `quotes` (lista; o jogo sorteia uma) ou `quote`. Ficam editáveis na aba Frases da planilha.
 - Cartaz-resumo: `python3 tools/poster.py` gera `screens/resumo_jogo.png`.
+
+## Novidades (BUILD 202610211520)
+- **Monte Pascoal**: terceiro cenário (`assets/stage_monte_pascoal.png`); entra na escolha de cenário e no rodízio do Arcade.
+- **CONTROLES**: no menu principal (e na pausa, tecla **C**) dá para trocar as teclas do P1 e do P2: escolha a ação, ENTER e aperte a nova tecla. Se a tecla já tiver dono, as duas trocam de lugar (aparece um aviso). Use **PADRÃO** para voltar às teclas originais e **SALVAR E VOLTAR** para guardar (fica salvo no navegador, em localStorage). Os botões de toque continuam valendo para o P1.
+- **Braços no estilo do Maués** para João Pedro e Milk (`tools/bracos.py`, que já roda no fim de `gerar_joao.py`/`gerar_milk.py`): braço da frente pendurado ao lado do corpo, braço de trás dobrado na barriga, soco com o braço inteiro saindo da manga, cotovelos fechados com contorno.

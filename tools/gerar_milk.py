@@ -35,15 +35,26 @@ UPV=lambda im: im.transpose(Image.ROTATE_180).transpose(Image.FLIP_LEFT_RIGHT)  
 FWD=lambda im: im.transpose(Image.ROTATE_90)                                       # horizontal, mão p/ frente
 UA=front.crop((0,0,front.width,10))            # braço (do fim da manga até o cotovelo)
 BUA=back.crop((0,0,back.width,6))
+def skin(im):
+    im=im.copy(); a=im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            if a[x,y][3] and sum(a[x,y][:3])<=110: a[x,y]=(0,0,0,0)
+    return im
+def arm(*parts):
+    """Junta braço+antebraço numa peça só (sem contorno interno) e contorna o conjunto: cotovelo fechado."""
+    L=canvas()
+    for im,x,y in parts: put(L,skin(im),x,y)
+    return outline(L)
 def pose(kind):
     c=canvas(); put(c,body,0,0)
-    # braço de trás: manga -> braço curto -> cotovelo -> antebraço p/ frente na barriga
-    if kind=='block': put(c,BUA,1,46); put(c,FWD(back),3,48)
-    else: put(c,BUA,1,46); put(c,FWD(back),3,50)
-    if kind=='guard':   put(c,UA,36,46); put(c,UPV(front),36,32)     # cotovelo em baixo (y~56), punho no queixo
-    elif kind=='punch': put(c,FWD(front),36,38)                     # soco esticado (cotovelo encostado na manga)
-    elif kind=='upper': put(c,UA,36,46); put(c,UPV(front),36,24)     # punho p/ cima
-    elif kind=='block': put(c,UA,36,46); put(c,UPV(front),37,28)     # antebraço na frente do rosto
+    # braço de trás: sai da manga (y45), desce até o cotovelo e o antebraço cruza a barriga
+    by=48 if kind=='block' else 50
+    c.alpha_composite(arm((back.crop((0,0,back.width,by-44)),1,45),(FWD(back),3,by)))
+    if kind=='guard':   c.alpha_composite(arm((UA,36,45),(UPV(front),36,32)))
+    elif kind=='punch': c.alpha_composite(arm((FWD(front),36,38)))
+    elif kind=='upper': c.alpha_composite(arm((UA,36,45),(UPV(front),36,24)))
+    elif kind=='block': c.alpha_composite(arm((UA,36,45),(UPV(front),37,28)))
     return outline(c)
 import os; d='assets/milk/'; os.makedirs(d,exist_ok=True)
 for k in('guard','punch','upper','block'): pose(k).save(d+k+'.png')
@@ -55,3 +66,6 @@ for i,k in enumerate(['guard','punch','upper','block','win']):
     else: t.alpha_composite(legR,(23,PADT+HIP)); t.alpha_composite(legL,(8,PADT+HIP)); t.alpha_composite(im,(0,0))
     sheet.alpha_composite(t.resize((t.width*4,t.height*4),0),(i*(W+PADR)*4,0))
 sheet.save('/tmp/milksheet.png')
+
+# braços no estilo do Maués (substitui guard/punch/upper/block)
+import runpy; runpy.run_path("tools/bracos.py")

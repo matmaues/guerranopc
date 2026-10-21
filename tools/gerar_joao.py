@@ -66,3 +66,6 @@ for i,k in enumerate(['guard','punch','upper','block','win']):
     if k!='win': t.alpha_composite(legR,(22,PADT+HIP)); t.alpha_composite(legL,(8,PADT+HIP)); t.alpha_composite(im,(0,0))
     big.alpha_composite(t.resize((t.width*4,t.height*4),0),(i*(W+PADR)*4,0))
 big.save('/tmp/jp3sheet.png')
+
+# braços no estilo do Maués (substitui guard/punch/upper/block)
+import runpy; runpy.run_path("tools/bracos.py")

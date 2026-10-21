@@ -55,7 +55,7 @@ function portrait(i, x, y, sc = 1, pose = "idle", flip = 1, dark, skin) {
   const f = PORTRAITS[i]; f.skin = skin || null; f.x = 0; f.y = 0; f.facing = flip; f.state = "idle"; f.anim = game.frame; f.flash = 0; f.input = {}; f.inFight = false; const op = f.pose; f.pose = () => pose;
   g.save(); try { g.translate(x, y); g.scale(sc, sc); if (dark) g.filter = "brightness(0)"; f.draw(g); } catch (e) { console.error("retrato", e); } finally { g.restore(); f.pose = op; }
 }
-function drawCommands(x, y, lh = 8, size = 6, cols = 2) {
+function drawCommands(x, y, lh = 8, size = 6, cols = 2) { const T = NOME_TECLA, b = BINDS.p1; COMMANDS[0][0] = T(b.lp) + " / " + T(b.hp); COMMANDS[1][0] = T(b.lk) + " / " + T(b.hk); COMMANDS[7][0] = "perto → / ← + " + T(b.hp); COMMANDS[8][0] = T(b.sp) + " / " + T(b.su); COMMANDS[9][0] = "Enter / " + T(b.start);
   const per = Math.ceil(COMMANDS.length / cols);
   COMMANDS.forEach(([k, d], i) => { const cx = x + Math.floor(i / per) * 150, cy = y + (i % per) * lh; txt(k, cx, cy, size, "#ffd23f", "left"); txt(d, cx + 62, cy, size, "#fff", "left"); });
 }
@@ -76,15 +76,16 @@ function title() {
     if (Math.floor(t / 15) % 2) txt("APERTE START", W / 2, 124, 12, "#ffd23f");
     if (P("ok")) { game.coin = 2; game.menuSel = 0; Audio8.menu(); }
   } else {
-    const items = ["ARCADE", "LUTA LIVRE (VS CPU)", "VERSUS (2 JOGADORES)", "DIFICULDADE: ◀ " + DIFFS[game.diff].n + " ▶", "COMANDOS"];
-    items.forEach((s, i) => txt((i === game.menuSel ? "▶ " : "  ") + s, W / 2, 110 + i * 11, 8, i === game.menuSel ? "#ffd23f" : "#bbb"));
-    if (P("up")) { game.menuSel = (game.menuSel + 4) % 5; Audio8.menu(); }
-    if (P("down")) { game.menuSel = (game.menuSel + 1) % 5; Audio8.menu(); }
+    const items = ["ARCADE", "LUTA LIVRE (VS CPU)", "VERSUS (2 JOGADORES)", "DIFICULDADE: ◀ " + DIFFS[game.diff].n + " ▶", "CONTROLES", "COMANDOS"];
+    items.forEach((s, i) => txt((i === game.menuSel ? "▶ " : "  ") + s, W / 2, 106 + i * 10, 8, i === game.menuSel ? "#ffd23f" : "#bbb"));
+    if (P("up")) { game.menuSel = (game.menuSel + 5) % 6; Audio8.menu(); }
+    if (P("down")) { game.menuSel = (game.menuSel + 1) % 6; Audio8.menu(); }
     if (game.menuSel === 3 && (P("left") || P("right"))) { game.diff = (game.diff + (P("left") ? 2 : 1)) % 3; Audio8.menu(); }
     if (P("ok")) { Audio8.menu();
       if (game.menuSel <= 2) { game.mode = ["arcade", "free", "versus"][game.menuSel]; game.ready = [false, false]; game.ladderPos = 0; game.screen = "select"; game.sel = [0, 1]; }
       if (game.menuSel === 3) game.diff = (game.diff + 1) % 3;
-      if (game.menuSel === 4) game.showCmds = true; }
+      if (game.menuSel === 4) abrirControles("title");
+      if (game.menuSel === 5) game.showCmds = true; }
     if (P("back")) game.coin = 1;
   }
   txt("CRÉDITO " + Math.min(1, game.coin), W - 6, H - 6, 7, "#aaa", "right");
@@ -275,14 +276,15 @@ function fight() {
     txt(w < 0 ? "EMPATE" : (game.mode === "versus" ? `P${w + 1} VENCE!` : w === 0 ? "VOCÊ VENCEU!" : "VOCÊ PERDEU!"), W / 2, 70, 16, "#fff", "center", "#00f", 1.5);
     if (game.perfect && w >= 0) bigTxt("PERFECT", 96, 26, "#ffd23f", "#f0f"); }
   if (game.paused) pauseMenu();
-  else if (Input.any(["Enter", "KeyP"]) && (game.phase === "fight" || game.phase === "intro")) { game.paused = true; Audio8.menu(); }
+  else if (Input.any(["Enter", "KeyP", BINDS.p1.start, BINDS.p2.start]) && (game.phase === "fight" || game.phase === "intro")) { game.paused = true; Audio8.menu(); }
 }
 function pauseMenu() {
   g.fillStyle = "#000c"; g.fillRect(0, 0, W, H); txt("PAUSA", W / 2, 18, 16, "#ffd23f", "center", "#f80", 1.5);
   txt("COMANDOS (direções relativas: → = para frente)", W / 2, 36, 6, "#8cf"); drawCommands(14, 48, 10, 6, 1);
-  txt("P2 (Versus): setas | Num4/5 soco | Num1/2 chute | Num6 esp. | Num3 super", W / 2, 152, 6, "#ccc");
-  txt("ENTER/P continuar    ESC sair para o título", W / 2, 166, 7, "#fff");
-  if (Input.any(["Enter", "KeyP"])) { game.paused = false; Audio8.menu(); }
+  txt("P2: " + ["up","down","left","right","lp","hp","lk","hk","sp","su"].map(a => NOME_TECLA(BINDS.p2[a])).join(" ") + "   (teclas atuais: menu CONTROLES)", W / 2, 152, 6, "#ccc");
+  txt("ENTER/P continuar   C controles   ESC sair", W / 2, 166, 7, "#fff");
+  if (Input.wasPressed("KeyC")) { abrirControles("fight"); return; }
+  if (Input.any(["Enter", "KeyP", BINDS.p1.start, BINDS.p2.start])) { game.paused = false; Audio8.menu(); }
   if (P("back")) { game.paused = false; Audio8.stopMusic(); game.screen = "title"; game.coin = 1; }
 }
 function endMatch(w) { game.matchWinner = w; game.screen = "quote"; game.qT = 0; Audio8.stopMusic(); if (game.mode === "versus" || w === 0) Audio8.win(); else Audio8.ko(); }
@@ -325,8 +327,51 @@ function ending() {
   if (t > 90 && game.frame % 30 < 20) txt("ENTER", W / 2, 172, 8, "#8cf");
   if (t > 90 && P("ok")) { game.screen = "title"; game.coin = 0; }
 }
+// ---------- CONTROLES (troca de teclas) ----------
+const ctl = { col: 0, row: 0, wait: false, msg: "", msgT: 0, from: "title", backup: null };
+function abrirControles(from) { Object.assign(ctl, { col: 0, row: 0, wait: false, msg: "", from, backup: JSON.stringify(BINDS) }); game.screen = "controls"; Audio8.menu(); Input.takeLast(); }
+function sairControles(salvar) {
+  if (salvar) salvarControles(); else { BINDS = JSON.parse(ctl.backup); aplicarControles(); }
+  game.screen = ctl.from; Audio8.menu();
+}
+function controls() {
+  g.fillStyle = "#0c0c24"; g.fillRect(0, 0, W, H);
+  for (let y = 0; y < H; y += 4) { g.fillStyle = "#11113a"; g.fillRect(0, y, W, 1); }
+  txt("CONTROLES", W / 2, 10, 12, "#ffd23f", "center", "#f80", 1.5);
+  const N = ACOES.length, y0 = 34, lh = 10, cx = [150, 245];
+  txt("P1", cx[0], 24, 8, "#ff3b3b"); txt("P2", cx[1], 24, 8, "#3b9bff");
+  const dono = k => { for (const pl of ["p1", "p2"]) for (const [a] of ACOES) if (BINDS[pl][a] === k) return [pl, a]; return null; };
+  ACOES.forEach(([a, nome], i) => {
+    const y = y0 + i * lh; txt(nome, 12, y, 7, "#fff", "left");
+    ["p1", "p2"].forEach((pl, c) => { const sel = ctl.row === i && ctl.col === c;
+      if (sel) { g.fillStyle = ctl.wait ? (game.frame % 20 < 10 ? "#f80" : "#a40") : "#ffd23f"; g.fillRect(cx[c] - 34, y - 5, 68, 9); }
+      txt(sel && ctl.wait ? "APERTE..." : NOME_TECLA(BINDS[pl][a]), cx[c], y, 7, sel ? "#000" : "#bdf"); });
+  });
+  const by = y0 + N * lh + 4, bts = ["PADRÃO", "SALVAR E VOLTAR", "CANCELAR"], bx = [60, 160, 262];
+  bts.forEach((b, i) => { const sel = ctl.row === N && ctl.col === i; g.fillStyle = sel ? "#ffd23f" : "#334"; g.fillRect(bx[i] - 42, by - 6, 84, 11); txt(b, bx[i], by, 7, sel ? "#000" : "#fff"); });
+  if (ctl.msgT > 0) { ctl.msgT--; txt(ctl.msg, W / 2, H - 16, 6, "#f84"); }
+  txt(ctl.wait ? "aperte a nova tecla (ESC cancela)" : "setas mover   ENTER trocar tecla   ESC voltar sem salvar", W / 2, H - 6, 6, "#8cf");
+  if (ctl.wait) {
+    const k = Input.takeLast(); if (!k || k.startsWith("T_")) return;
+    ctl.wait = false; if (k === "Escape") return;
+    const pl = ["p1", "p2"][ctl.col], a = ACOES[ctl.row][0], velho = BINDS[pl][a], d = dono(k);
+    if (d && !(d[0] === pl && d[1] === a)) { BINDS[d[0]][d[1]] = velho; ctl.msg = `CONFLITO: ${NOME_TECLA(k)} era de ${d[0].toUpperCase()} ${ACOES.find(x => x[0] === d[1])[1]} — teclas trocadas`; ctl.msgT = 180; }
+    BINDS[pl][a] = k; aplicarControles(); Audio8.coin(); Input.endFrame(); return;
+  }
+  const raw = k => Input.wasPressed(k), cols = ctl.row === N ? 3 : 2;
+  if (raw("ArrowUp")) { ctl.row = (ctl.row + N) % (N + 1); ctl.col = Math.min(ctl.col, ctl.row === N ? 2 : 1); Audio8.menu(); }
+  if (raw("ArrowDown")) { ctl.row = (ctl.row + 1) % (N + 1); ctl.col = Math.min(ctl.col, ctl.row === N ? 2 : 1); Audio8.menu(); }
+  if (raw("ArrowLeft")) { ctl.col = (ctl.col + cols - 1) % cols; Audio8.menu(); }
+  if (raw("ArrowRight")) { ctl.col = (ctl.col + 1) % cols; Audio8.menu(); }
+  if (raw("Escape")) return sairControles(false);
+  if (raw("Enter") || raw("NumpadEnter")) {
+    if (ctl.row < N) { ctl.wait = true; Input.takeLast(); Audio8.menu(); }
+    else if (ctl.col === 0) { BINDS = JSON.parse(JSON.stringify(BINDS_PADRAO)); aplicarControles(); ctl.msg = "TECLAS PADRÃO RESTAURADAS (salve para manter)"; ctl.msgT = 150; Audio8.coin(); }
+    else sairControles(ctl.col === 1);
+  }
+}
 // ---------- loop ----------
-const SCREENS = { title, select, stageSelect, vs, fight, quote, continue: cont, gameover, ending };
+const SCREENS = { controls, title, select, stageSelect, vs, fight, quote, continue: cont, gameover, ending };
 let last = 0, acc = 0;
 function loop(ts) {
   acc += Math.min(100, ts - (last || ts)); last = ts;
